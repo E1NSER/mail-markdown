@@ -1,0 +1,25 @@
+name: Bug report
+description: Report a problem with Markdown conversion in Apple Mail.
+body:
+  - type: markdown
+    attributes:
+      value: Please use an anonymized test draft. Do not include private emails, clipboard contents or signing credentials.
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: macOS, Apple Mail, Mail Markdown, and Intel or Apple Silicon.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include a short anonymized Markdown example, expected result and actual result.
+    validations:
+      required: true
+  - type: textarea
+    id: status
+    attributes:
+      label: App status
+      description: What does the menu bar status show? Is Accessibility enabled, and is the draft rich text?

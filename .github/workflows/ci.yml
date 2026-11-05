@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Show toolchain
+        run: swift --version
+      - name: Test Markdown rendering and RTF
+        run: swift test
+      - name: Build and verify universal app
+        env:
+          MAIL_MARKDOWN_SIGNING_IDENTITY: "-"
+        run: zsh scripts/build-app.sh --universal --staging-output "$PWD/dist/ci/Mail Markdown.app"

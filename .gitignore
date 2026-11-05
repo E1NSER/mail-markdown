@@ -1,0 +1,24 @@
+.build/
+.swiftpm/
+dist/
+.DS_Store
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+*.p12
+*.p8
+*.key
+*.pem
+*.cer
+*.mobileprovision
+*.provisionprofile
+*.log
+*.crash
+*.ips
+xcuserdata/
+*.xcuserstate
+
+# Private design comparisons can include third-party reference artwork.
+/design/*.png

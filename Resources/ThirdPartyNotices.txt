@@ -1,0 +1,35 @@
+Mail Markdown — Drittanbieterhinweise
+====================================
+
+Mail Markdown selbst steht unter der MIT-Lizenz; siehe LICENSE.txt.
+Die folgenden Drittanbieter-Komponenten behalten ihre eigenen Lizenzen.
+
+Die App verwendet die folgenden Bibliotheken aus den im Projekt fixierten
+Swift-Package-Abhängigkeiten. Die aufgeführten Lizenz- und Hinweisdateien
+wurden unverändert aus den jeweiligen Quellcode-Checkouts übernommen.
+
+Swift Markdown 0.9.0
+--------------------
+Projekt: https://github.com/swiftlang/swift-markdown
+Revision: 25cb61d3482054b09ae76ca4f281b1bfe7fe5a43
+Copyright (c) 2021 Apple Inc. and the Swift project authors
+Lizenz: Apache License 2.0 mit Runtime Library Exception
+Vollständiger Lizenztext: LICENSES/swift-markdown-LICENSE.txt
+Vollständige Upstream-Hinweise: LICENSES/swift-markdown-NOTICE.txt
+
+Der Upstream-NOTICE-Text wird vollständig mitgeliefert, einschließlich der
+dort genannten weiteren Projektverweise.
+
+Swift cmark / cmark-gfm 0.9.0
+----------------------------
+Projekt: https://github.com/swiftlang/swift-cmark
+Revision: 08ddb528923cc1a6527e02b7a1aee9e516ca749a
+Upstream: https://github.com/github/cmark-gfm
+Copyright- und Lizenztexte: LICENSES/swift-cmark-COPYING.txt
+
+Die vollständige COPYING-Datei enthält die cmark-Lizenz sowie die dort
+aufgeführten Copyright- und Lizenzhinweise für abgeleitete Komponenten.
+
+Ablage in der App
+-----------------
+Diese Datei und der Ordner LICENSES liegen unter Contents/Resources der App.
