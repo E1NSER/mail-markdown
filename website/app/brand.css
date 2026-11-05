@@ -102,16 +102,45 @@
   background: #e5f1ff;
 }
 .hero-band {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
   background: var(--brand-blue);
   color: white;
 }
+.hero-band::before {
+  content: "";
+  position: absolute;
+  inset: -18% -12%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 82% 30%, #094f9f66, #094f9f00 63%),
+    radial-gradient(ellipse at 14% 78%, #093f7f33, #093f7f00 54%);
+  mask-image: linear-gradient(to bottom, transparent 16%, black 36%, black 82%, transparent);
+  opacity: 0.85;
+  transform: translate3d(2%, -2%, 0) scale(1.02);
+  animation: hero-light-settle 4.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes hero-light-settle {
+  from {
+    opacity: 0.3;
+    transform: translate3d(-3%, 4%, 0) scale(1.06);
+  }
+  to {
+    opacity: 0.85;
+    transform: translate3d(2%, -2%, 0) scale(1.02);
+  }
+}
 .hero {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-height: 0;
   padding: 36px 0 0;
   margin-top: 0;
-  gap: 15px;
+  gap: 32px;
   border-radius: 0;
   background: transparent;
 }
@@ -794,21 +823,23 @@
     width: calc(100% - 100px);
   }
   .hero {
-    grid-template-columns: 1fr 1fr;
-    padding-top: 48px;
-    gap: 0 25px;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    padding-top: 64px;
+    gap: 0 clamp(40px, 4.5vw, 76px);
     min-height: 0;
-    align-items: center;
+    align-items: start;
   }
   .hero-copy {
-    padding-bottom: 40px;
+    padding-top: 56px;
+    padding-bottom: 0;
   }
   .hero h1 {
-    font-size: clamp(78px, 7.6vw, 116px);
+    font-size: clamp(72px, 6.5vw, 100px);
+    letter-spacing: -0.065em;
   }
   .hero-description {
     font-size: 17px;
-    max-width: 360px;
+    max-width: 420px;
     margin-top: 30px;
   }
   .hero-actions {
@@ -908,15 +939,11 @@
 }
 @media (min-width: 1350px) {
   .hero {
-    gap: 35px;
-    padding-top: 55px;
-  }
-  .hero h1 {
-    font-size: 116px;
+    padding-top: 72px;
   }
   .hero-description {
     font-size: 18px;
-    max-width: 405px;
+    max-width: 440px;
   }
   .hero-scene {
     min-height: 650px;
@@ -933,6 +960,10 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .hero-band::before {
+    animation: none;
+    transform: none;
+  }
   html {
     scroll-behavior: auto;
   }

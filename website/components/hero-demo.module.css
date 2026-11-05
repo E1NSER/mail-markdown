@@ -4,12 +4,13 @@
   align-items: flex-end;
   gap: 10px;
   min-height: 0;
-  padding-block: 8px 24px;
+  margin: 0 auto;
+  padding-block: 0 12px;
   perspective: 1100px;
 }
 .chatWindow {
   width: 92%;
-  align-self: flex-start;
+  align-self: flex-end;
   overflow: hidden;
   border: 1px solid #ffffff38;
   border-radius: 12px;
@@ -182,6 +183,7 @@
 .replay:hover { text-decoration: underline; text-underline-offset: 4px; }
 .sceneFooter > span { font-size: 9px; line-height: 1.5; text-align: center; }
 .scene button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.scene .copyButton:focus-visible { outline-offset: -3px; }
 .mailWindow button:focus-visible { outline-color: #1375db; outline-offset: -3px; }
 @media (min-width: 640px) {
   .scene.scene { gap: 12px; }
