@@ -20,16 +20,16 @@ const mono = DM_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Mail Markdown — Dein Text. Hat Format.",
+    default: "Mail Markdown — Markdown-Erweiterung für Apple Mail",
     template: "%s · Mail Markdown",
   },
   description:
-    "Die kostenlose Mac-App für Markdown in Apple Mail. Mit ⌘V einfügen und Schrift, Größe und Farbe deines Entwurfs beibehalten. Lokal und Open Source.",
+    "Markdown aus KI-Chats direkt in Apple Mail einfügen. Die kostenlose Erweiterung übernimmt mit ⌘V Schrift, Größe und Farbe deines bestehenden Mail-Entwurfs.",
   applicationName: "Mail Markdown",
   authors: [{ name: "E1NSER.", url: "https://einser.at" }],
   openGraph: {
-    title: "Dein Text. Hat Format.",
-    description: "Markdown für Apple Mail. Kostenlos, lokal und Open Source.",
+    title: "Dein KI-Text. In Apple Mail.",
+    description: "Die Markdown-Erweiterung für Apple Mail. KI-Text mit ⌘V im Stil deines bestehenden Entwurfs einfügen. Kostenlos und Open Source.",
     locale: "de_AT",
     type: "website",
   },

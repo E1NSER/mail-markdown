@@ -31,6 +31,18 @@ function downloadAnswer(release: ReleaseState): string {
 function getFaqs(release: ReleaseState) {
   return [
     [
+      "Wie erweitert Mail Markdown Apple Mail?",
+      "Mail Markdown ergänzt das Einfügen mit ⌘V direkt in Apple Mail. Du schreibst und versendest weiterhin in deinem gewohnten Mail-Editor. Die Erweiterung läuft dafür als eigenständige App in der macOS-Menüleiste. Sie wird separat installiert und erscheint nicht in Mails Erweiterungseinstellungen.",
+    ],
+    [
+      "Wie nutze ich E-Mail-Texte aus einem KI-Chat?",
+      "Lass dir den E-Mail-Text als Markdown ausgeben. Kopiere den Markdown-Quelltext mit Sternchen, Listenzeichen und Links und füge ihn mit ⌘V in einen bestehenden Apple-Mail-Entwurf ein. Mail Markdown macht daraus echte Formatierung und übernimmt Schrift, Größe und Farbe aus deinem Entwurf.",
+    ],
+    [
+      "Was passiert mit mitkopierten schwarzen Hintergründen?",
+      "Bei der Umwandlung eines erkannten Markdown-Textes baut Mail Markdown die Formatierung aus dem Stil deines Entwurfs neu auf. Fremde Schriften, Farben und Hintergründe aus der Quelle werden dabei nicht übernommen. Bereits falsch eingefügten Text bereinigt die App nicht automatisch. Ohne erkannten Markdown oder lesbare Stilprobe bleibt das normale Einfügen von Apple Mail bestehen.",
+    ],
+    [
       "Ist Mail Markdown wirklich kostenlos?",
       "Ja. Die App ist kostenlos und unbegrenzt nutzbar. Es gibt kein Abo, kein Konto und kein Limit für deine Markdown-Texte. Der Quellcode steht unter der MIT-Lizenz auf GitHub.",
     ],
@@ -73,17 +85,17 @@ export default async function Home() {
             <section className="hero section-wrap" aria-labelledby="hero-title">
               <div className="hero-copy">
                 <div className="eyebrow hero-eyebrow">
-                  <span className="tiny-dot" /> FÜR APPLE MAIL GEMACHT
+                  <span className="tiny-dot" /> DIE MARKDOWN-ERWEITERUNG FÜR APPLE MAIL
                 </div>
                 <h1 id="hero-title">
-                  Dein Text.
+                  Dein KI-Text.
                   <br />
-                  <span>Hat Format.</span>
+                  <span>In Apple Mail.</span>
                 </h1>
                 <p className="hero-description">
-                  Markdown rein. Schöne Mail raus. Ein ⌘V übernimmt die
-                  Formatierung – in der Schrift, Größe und Farbe deines
-                  Entwurfs.
+                  Kopiere Markdown aus deinem KI-Chat und füge ihn mit ⌘V
+                  direkt in Apple Mail ein. Mail Markdown übernimmt die Schrift,
+                  Größe und Farbe deines bestehenden Entwurfs.
                 </p>
                 <div className="hero-actions">
                   <DownloadButton
@@ -110,19 +122,25 @@ export default async function Home() {
             <div className="section-wrap">
               <Reveal className="play-heading">
                 <div>
-                  <div className="eyebrow">01 — MARKDOWN IN APPLE MAIL</div>
+                  <div className="eyebrow">01 — AUS DEM KI-CHAT IN DEINE MAIL</div>
                   <h2>
-                    Markdown in
+                    KI-Mail rein.
                     <br />
-                    <span>Mail-Format.</span>
+                    <span>Dein Stil bleibt.</span>
                   </h2>
                 </div>
                 <div className="play-intro">
-                  <p>
-                    Apple Mail formatiert eingefügtes Markdown nicht automatisch.
-                    Mail Markdown macht daraus formatierten Text – in Schriftart,
-                    Größe und Farbe deines Entwurfs.
-                  </p>
+                  <div className="play-explanation">
+                    <p>
+                      Rich Text aus dem KI-Chat bringt oft fremde Schriften,
+                      Farben oder schwarze Hintergründe mit. Reines Markdown
+                      wiederum zeigt Apple Mail als Sternchen und Listenzeichen.
+                    </p>
+                    <p>
+                      Mail Markdown ergänzt dein ⌘V: Die Erweiterung formatiert
+                      Markdown direkt in Apple Mail – im Stil deines Entwurfs.
+                    </p>
+                  </div>
                 </div>
               </Reveal>
               <Reveal>
@@ -195,13 +213,13 @@ export default async function Home() {
                 width={94}
                 height={94}
               />
-              <div className="eyebrow">BEREIT FÜR DEIN NÄCHSTES ⌘V?</div>
+              <div className="eyebrow">DIE ERWEITERUNG FÜR DEIN ⌘V</div>
               <h2>
-                Gute Worte verdienen
+                Dein nächster KI-Text.
                 <br />
-                <span>gutes Format.</span>
+                <span>Im Stil deiner Mail.</span>
               </h2>
-              <p>Kostenlos. Unbegrenzt. Für deinen Mac.</p>
+              <p>Markdown mit ⌘V direkt in Apple Mail einfügen. Kostenlos und unbegrenzt.</p>
               <div className="section-actions start-actions">
                 <DownloadButton
                   className="button button-primary"

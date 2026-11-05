@@ -357,6 +357,9 @@
   align-items: center;
   gap: 25px;
 }
+.play-explanation p + p {
+  margin-top: 16px;
+}
 .play-heading p {
   font-size: 16px;
   line-height: 1.8;
@@ -739,7 +742,7 @@
   }
   .play-heading {
     grid-template-columns: 1fr 1fr;
-    align-items: end;
+    align-items: start;
     gap: 40px;
     margin-bottom: 45px;
   }

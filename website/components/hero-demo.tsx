@@ -170,11 +170,11 @@ export function HeroDemo() {
       ref={stage}
       className={`hero-scene ${styles.scene}`}
       role="group"
-      aria-label="Interaktive Demo: Markdown in Apple Mail formatieren"
+      aria-label="Browser-Demo: KI-Markdown in Apple Mail einfügen"
     >
       <div className="scene-topline">
         <span>01</span>
-        <span>MARKDOWN → MAIL</span>
+        <span>KI-MARKDOWN → APPLE MAIL</span>
       </div>
       <motion.div
         className={`hero-window ${styles.window}`}
@@ -194,7 +194,7 @@ export function HeroDemo() {
             <i />
             <i />
           </div>
-          <span>Eine kleine Nachricht</span>
+          <span>Apple Mail · Neuer Entwurf</span>
           <span className="window-title-icon" aria-hidden="true">
             <Send size={15} />
           </span>
@@ -215,7 +215,7 @@ export function HeroDemo() {
           <div
             className="demo-fonts"
             role="group"
-            aria-label="Schrift der formatierten Beispielnachricht"
+            aria-label="Schrift des Apple-Mail-Entwurfs in der Demo"
           >
             {fontNames.map((name) => (
               <button
@@ -281,7 +281,7 @@ export function HeroDemo() {
                 <motion.path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" initial={false} animate={{ pathLength: complete ? 1 : 0, opacity: complete ? 1 : 0 }} transition={{ duration: animated ? 0.24 : 0, ease }} />
               </svg>
             </i>
-            {complete ? "Dein Stil. Jetzt mit Format." : demo.phase === "raw" ? "Markdown wartet auf sein ⌘V." : "Formatierung wird übernommen."}
+            {complete ? "Im Stil deines Mail-Entwurfs." : demo.phase === "raw" ? "Markdown aus deinem KI-Chat." : "Mail-Stil wird übernommen."}
           </span>
         </div>
       </motion.div>
@@ -293,7 +293,7 @@ export function HeroDemo() {
           animate={{ y: animated && demo.phase === "press" ? 3 : 0 }}
           transition={{ duration: animated ? (demo.phase === "press" ? 0.08 : 0.18) : 0, ease }}
           onClick={toggleDemo}
-          aria-label="Formatierung der Mail-Demo umschalten"
+          aria-label="Einfügen von KI-Markdown in der Apple-Mail-Demo umschalten"
           aria-pressed={targetFormatted.current}
           aria-controls="hero-mail-preview"
         >
@@ -301,12 +301,12 @@ export function HeroDemo() {
           <span aria-hidden="true">V</span>
         </motion.button>
         <div>
-          <span className="paste-control-label">Einfügen. Auf deine Art.</span>
+          <span className="paste-control-label">Einfügen in Apple Mail.</span>
           <button type="button" className={`paste-control-hint ${styles.replay}`} onClick={() => play(true)} aria-controls="hero-mail-preview"><RotateCcw size={12} aria-hidden="true" /> Demo wiederholen</button>
         </div>
       </div>
       <div className="scene-caption">
-        Browser-Demo. Ohne Verbindung zu deiner Mail-App.
+        Browser-Demo des Einfügens. Keine Verbindung zu Apple Mail.
       </div>
     </div>
   );

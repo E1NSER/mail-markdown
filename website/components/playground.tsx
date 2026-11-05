@@ -77,7 +77,7 @@ export function Playground() {
         <div className="editor-panel">
           <div className="panel-label">
             <span>
-              <span className="panel-number">01</span> Dein Markdown
+              <span className="panel-number">01</span> Markdown aus der KI
             </span>
             <span className="editable-badge">
               Hier schreiben
@@ -101,7 +101,7 @@ export function Playground() {
             </span>
           </div>
           <label className="sr-only" htmlFor="markdown-input">
-            Markdown ausprobieren
+            Markdown aus der KI ausprobieren
           </label>
           <textarea
             id="markdown-input"
@@ -125,7 +125,7 @@ export function Playground() {
         <div className="result-panel">
           <div className="panel-label">
             <span>
-              <span className="panel-number">02</span> Dein Mail-Stil
+              <span className="panel-number">02</span> Dein Apple-Mail-Stil
             </span>
             <span className="live-badge">
               <span /> Live
@@ -200,7 +200,10 @@ export function Playground() {
           <span className="privacy-dot" /> Diese Browser-Demo verarbeitet deinen
           Text nur auf deinem Gerät.
         </span>
-        <span>Die Mac-App liest den Stil direkt aus deinem Entwurf.</span>
+        <span>
+          Die installierte Erweiterung übernimmt den Stil deines
+          Apple-Mail-Entwurfs.
+        </span>
       </div>
     </div>
   );

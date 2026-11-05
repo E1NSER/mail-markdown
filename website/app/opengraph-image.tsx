@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "Mail Markdown — Dein Text. Hat Format. Kostenlos für deinen Mac.";
+  "Mail Markdown — Dein KI-Text. In Apple Mail. Die kostenlose Markdown-Erweiterung für Apple Mail.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -51,8 +51,8 @@ export default function OpenGraphImage() {
           fontWeight: 700,
         }}
       >
-        <span>Dein Text.</span>
-        <span style={{ color: "#cce6ff", fontWeight: 700 }}>Hat Format.</span>
+        <span>Dein KI-Text.</span>
+        <span style={{ color: "#cce6ff", fontWeight: 700 }}>In Apple Mail.</span>
       </div>
       <div
         style={{
@@ -63,7 +63,7 @@ export default function OpenGraphImage() {
           color: "#d7edff",
         }}
       >
-        <span>Markdown für Apple Mail.</span>
+        <span>Die Markdown-Erweiterung für Apple Mail.</span>
         <span>Kostenlos. Lokal. Open Source.</span>
       </div>
       <div
