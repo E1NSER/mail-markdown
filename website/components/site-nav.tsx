@@ -49,6 +49,7 @@ export function SiteNav({
         <DownloadButton
           className="nav-cta"
           available={downloadAvailable}
+          location="header"
           compact
         />
         <button

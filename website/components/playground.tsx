@@ -79,7 +79,26 @@ export function Playground() {
             <span>
               <span className="panel-number">01</span> Dein Markdown
             </span>
-            <span className="editable-badge">Hier schreiben</span>
+            <span className="editable-badge">
+              Hier schreiben
+              <svg
+                className="editor-hint-arrow"
+                width="70"
+                height="36"
+                viewBox="0 0 70 36"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M58 3C73 4 64 16 43 17C29 18 18 23 12 31M12 21V31L22 28"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
           </div>
           <label className="sr-only" htmlFor="markdown-input">
             Markdown ausprobieren

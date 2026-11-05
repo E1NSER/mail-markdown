@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, DM_Mono } from "next/font/google";
+import { ConsentProvider } from "@/components/consent-provider";
 import "./globals.css";
 import "./brand.css";
 
@@ -44,7 +45,11 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${manrope.variable} ${mono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <ConsentProvider measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}>
+          {children}
+        </ConsentProvider>
+      </body>
     </html>
   );
 }

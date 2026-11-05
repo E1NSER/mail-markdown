@@ -17,6 +17,8 @@ npm run dev
 
 Open the local address printed by Next.js. No application environment variables are required. Keep local `.env` files and Vercel credentials out of Git.
 
+Optional website statistics use `NEXT_PUBLIC_GA_MEASUREMENT_ID`; see [Analytics setup](ANALYTICS.md) for the required GA4 stream settings, consent behavior and event definitions. Leave the variable unset to keep analytics disabled.
+
 Before submitting changes:
 
 ```sh
@@ -29,7 +31,7 @@ npm run build
 
 The editable playground renders Markdown in the browser with `react-markdown`, `remark-gfm` and `remark-breaks`. Sample, font and color controls illustrate how formatting inherits a draft's style. The browser demo does not connect to Apple Mail; the native app uses its own Swift parser and RTF output.
 
-User-entered text stays in client state. There is no text-processing API, account system, analytics integration or application cookie. Ordinary hosting requests are covered by the site's [privacy page](app/datenschutz/page.tsx).
+User-entered text stays in client state. There is no text-processing API or account system. Optional GA4 statistics load only after explicit analytics consent and a valid measurement ID is configured. Markdown, clipboard contents and editor interactions are never included in analytics events. Ordinary hosting requests and optional statistics are covered by the site's [privacy page](app/datenschutz/page.tsx).
 
 Manrope and DM Mono use `next/font`: font files are fetched at build time and served by the deployment, without visitor requests to Google Fonts. The app icon is original project artwork. No Mobbin screenshots or assets are included.
 
@@ -63,7 +65,7 @@ No release, a release missing its DMG, and a temporarily unavailable GitHub API 
 
 ## Reference notes
 
-The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a working native Mail specimen and an animated app-icon composition. The hero offers a font switch and an explicit formatting toggle; it plays the conversion once, with no decorative animation loop. The editable playground remains local. GitHub star counts are read server-side with five-minute caching; missing metadata hides the count instead of inventing one.
+The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a working native Mail specimen and an animated app-icon composition. The hero offers a font switch and an explicit formatting toggle; it plays the conversion once. Subtle Markdown syntax drifts in the background with a pause control and a static reduced-motion alternative. The editable playground remains local. GitHub star counts are read server-side with five-minute caching; missing metadata hides the count instead of inventing one.
 
 - [Superlist on Awwwards](https://www.awwwards.com/sites/superlist): concentrated brand color, large typography and a single product composition. [Button interaction reference](https://www.awwwards.com/inspiration/superlist-notification-button).
 - [Tezuka Reader in the Webflow Showcase](https://webflow.com/made-in-webflow/website/tezuka-reader), [live site](https://tezuka-xr.webflow.io/): native interface language and a large, focused product view.

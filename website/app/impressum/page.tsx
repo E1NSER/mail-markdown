@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/consent-provider";
 
 export const metadata: Metadata = {
   title: "Impressum",
@@ -73,6 +74,7 @@ export default function ImpressumPage() {
           Website und zur Abgrenzung von der macOS-App stehen in unserer{" "}
           <Link href="/datenschutz">Datenschutzerklärung</Link>.
         </p>
+        <CookieSettingsButton className="legal-cookie-settings" />
       </section>
 
       <section>

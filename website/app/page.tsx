@@ -1,16 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowDown,
-  ArrowUpRight,
-  Code2,
-  Command,
-  Heart,
-  LockKeyhole,
-  Monitor,
-  Plus,
-} from "lucide-react";
+import { ArrowDown, ArrowUpRight, Monitor, Plus } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { HeroDemo } from "@/components/hero-demo";
 import { Playground } from "@/components/playground";
@@ -18,6 +9,8 @@ import { MotionProvider, Reveal } from "@/components/motion";
 import { DownloadButton } from "@/components/download-button";
 import { GitHubButton } from "@/components/github-button";
 import { AppIconScene } from "@/components/app-icon-scene";
+import { MarkdownBackdrop } from "@/components/markdown-backdrop";
+import { CookieSettingsButton } from "@/components/consent-provider";
 import { getRepositoryStars } from "@/lib/github-repository";
 import { getLatestRelease } from "@/lib/github-release";
 import { RELEASES_URL, type ReleaseState } from "@/lib/release-model";
@@ -78,6 +71,7 @@ export default async function Home() {
         <SiteNav downloadAvailable={downloadAvailable} stars={stars} />
         <main id="inhalt">
           <div className="hero-band">
+            <MarkdownBackdrop />
             <section className="hero section-wrap" aria-labelledby="hero-title">
               <div className="hero-copy">
                 <div className="eyebrow hero-eyebrow">
@@ -97,6 +91,7 @@ export default async function Home() {
                   <DownloadButton
                     className="button button-primary"
                     available={downloadAvailable}
+                    location="hero"
                   />
                   <a className="button button-text" href="#spielplatz">
                     Probier’s aus <ArrowDown size={17} />
@@ -117,34 +112,18 @@ export default async function Home() {
             <div className="section-wrap">
               <Reveal className="play-heading">
                 <div>
-                  <div className="eyebrow">01 — SELBST IST DER CURSOR</div>
+                  <div className="eyebrow">01 — MARKDOWN IN APPLE MAIL</div>
                   <h2>
-                    Mach’s zu
+                    Markdown in
                     <br />
-                    <span>deinem Text.</span>
+                    <span>Mail-Format.</span>
                   </h2>
                 </div>
                 <div className="play-intro">
-                  <svg
-                    className="play-doodle"
-                    viewBox="0 0 126 116"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M15 12C96 -6 122 48 66 87C57 94 42 98 28 98M28 98L42 77M28 98L54 102"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
                   <p>
-                    Schreib links. Schau rechts.
-                    <br />
-                    Spiel mit Schrift und Farbe.
-                    <br />
-                    Das hier ist deine Spielwiese.
+                    Apple Mail formatiert eingefügtes Markdown nicht automatisch.
+                    Mail Markdown macht daraus formatierten Text – in Schriftart,
+                    Größe und Farbe deines Entwurfs.
                   </p>
                 </div>
               </Reveal>
@@ -161,62 +140,6 @@ export default async function Home() {
                   <span className="format-code">`Code`</span>
                   <span>❝ Zitate</span>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="principles-section section-wrap">
-            <Reveal className="principles-head">
-              <div className="eyebrow">02 — PASST IN DEINEN ALLTAG</div>
-              <h2>
-                Kleine App.
-                <br />
-                Klare Sache.
-              </h2>
-            </Reveal>
-            <div className="principles-grid">
-              <Reveal className="local-principle">
-                <LockKeyhole size={26} strokeWidth={1.5} />
-                <h3>
-                  Deine Worte.
-                  <br />
-                  Dein Mac.
-                  <br />
-                  <span>Bleibt so.</span>
-                </h3>
-                <p>
-                  Die Formatierung passiert lokal auf deinem Mac. Ohne Konto,
-                  Upload oder Konvertierungsserver.
-                </p>
-                <Link href="/datenschutz" className="inline-link">
-                  Zum Datenschutz <ArrowUpRight size={17} />
-                </Link>
-              </Reveal>
-              <div className="principle-notes">
-                <Reveal>
-                  <Command size={25} />
-                  <h3>Du kennst dich schon aus.</h3>
-                  <p>
-                    Ein vertrautes Tastenkürzel. In Apple Mail. Die App bleibt
-                    in der Menüleiste, bis du sie brauchst.
-                  </p>
-                </Reveal>
-                <Reveal>
-                  <Heart size={25} />
-                  <h3>Einfach ein gutes Tool.</h3>
-                  <p>
-                    Kostenlos und unbegrenzt. Ohne Abo, Zähler oder
-                    Freischaltung.
-                  </p>
-                </Reveal>
-                <Reveal>
-                  <Code2 size={25} />
-                  <h3>Offen bis zur letzten Zeile.</h3>
-                  <p>
-                    Unter der MIT-Lizenz. Zum Benutzen, Verbessern und
-                    Weiterbauen.
-                  </p>
-                </Reveal>
               </div>
             </div>
           </section>
@@ -238,6 +161,7 @@ export default async function Home() {
                   <DownloadButton
                     className="button button-primary"
                     available={downloadAvailable}
+                    location="source"
                   />
                   <GitHubButton className="button button-outline" />
                 </div>
@@ -248,7 +172,7 @@ export default async function Home() {
 
           <section className="faq-section section-wrap">
             <Reveal className="faq-heading">
-              <div className="eyebrow">03 — GUT ZU WISSEN</div>
+              <div className="eyebrow">02 — GUT ZU WISSEN</div>
               <h2>Die Details.</h2>
               <p>Die Details, bevor du loslegst.</p>
             </Reveal>
@@ -284,6 +208,7 @@ export default async function Home() {
                 <DownloadButton
                   className="button button-primary"
                   available={downloadAvailable}
+                  location="final"
                 />
                 <GitHubButton className="button button-outline" />
               </div>
@@ -340,6 +265,7 @@ export default async function Home() {
             </a>
             <Link href="/datenschutz">Datenschutz</Link>
             <Link href="/impressum">Impressum</Link>
+            <CookieSettingsButton className="footer-cookie-settings" />
           </nav>
         </footer>
         <div className="trademark-note section-wrap">
