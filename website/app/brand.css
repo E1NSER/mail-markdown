@@ -1193,3 +1193,40 @@
     gap: 90px;
   }
 }
+
+/* The hero is one composed product scene, with copy and windows sharing an axis. */
+.hero {
+  padding-top: 35px;
+  padding-bottom: 24px;
+  gap: 38px;
+}
+.hero h1 {
+  font-weight: 650;
+  line-height: 1.055;
+  letter-spacing: -0.067em;
+}
+.hero-description {
+  max-width: 410px;
+  margin-top: 24px;
+  line-height: 1.75;
+}
+.hero-actions { margin-top: 26px; }
+.hero-facts { margin-top: 20px; }
+@media (min-width: 640px) {
+  .hero { padding-top: 44px; padding-bottom: 26px; gap: 42px; }
+  .hero h1 { font-size: clamp(72px, 9vw, 96px); }
+}
+@media (min-width: 1000px) {
+  .hero {
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    align-items: center;
+    column-gap: clamp(38px, 4vw, 68px);
+    padding-top: 48px;
+    padding-bottom: 32px;
+  }
+  .hero-copy { padding-top: 0; padding-bottom: 35px; }
+  .hero h1 { font-size: clamp(62px, 5.45vw, 82px); }
+  .hero-description { font-size: 17px; max-width: 390px; margin-top: 27px; }
+  .hero-actions { gap: 22px; margin-top: 28px; }
+  .hero-facts { margin-top: 23px; }
+}

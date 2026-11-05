@@ -9,13 +9,24 @@
 
 .field {
   position: absolute;
-  inset: -20%;
+  inset: -16%;
   animation-play-state: paused;
+}
+
+.plane {
+  position: absolute;
+  inset: -12%;
+  transform: translate3d(0, 0, 0);
+}
+
+.layer[data-running="true"] .plane {
+  will-change: transform;
 }
 
 /* Only darker tones are composited over icon blue, preserving white text contrast. */
 .first {
-  background: radial-gradient(ellipse at 66% 40%, #074b9e99, #074b9e44 28%, #074b9e00 65%);
+  background:
+    radial-gradient(ellipse at 76% 34%, #063f8ac9, #074b9e62 31%, #074b9e00 68%);
   opacity: 0.7;
   transform: translate3d(-7%, 4%, 0) scale(1.04);
   animation: ambient-first 20s ease-in-out infinite alternate;
@@ -23,7 +34,9 @@
 }
 
 .second {
-  background: radial-gradient(ellipse at 30% 72%, #073f8b77, #073f8b00 62%);
+  background:
+    linear-gradient(122deg, #073f8b00 26%, #073f8b63 48%, #073f8b00 76%),
+    radial-gradient(ellipse at 22% 85%, #073f8b94, #073f8b00 60%);
   opacity: 0.55;
   transform: translate3d(7%, -4%, 0) scale(1.02);
   animation: ambient-second 24s ease-in-out infinite alternate;
@@ -96,6 +109,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .layer .plane {
+    transform: none !important;
+    will-change: auto !important;
+  }
+
   .layer .field {
     animation: none !important;
     transform: none !important;

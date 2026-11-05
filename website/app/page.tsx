@@ -91,9 +91,8 @@ export default async function Home() {
                   <span>In Apple Mail.</span>
                 </h1>
                 <p className="hero-description">
-                  Kopiere Markdown aus deinem KI-Chat und füge ihn mit ⌘V
-                  direkt in Apple Mail ein. Die Erweiterung übernimmt dabei
-                  Schrift, Größe und Farbe deines bestehenden Entwurfs.
+                  Füge Markdown aus deinem KI-Chat mit ⌘V in Apple Mail ein.
+                  Die Erweiterung übernimmt Schrift, Größe und Farbe deines Entwurfs.
                 </p>
                 <div className="hero-actions">
                   <DownloadButton
