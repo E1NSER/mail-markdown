@@ -3,7 +3,7 @@
 `build-app.sh` erstellt standardmäßig eine Universal-App für Apple Silicon und Intel. Die Bundle-ID bleibt für bestehende Berechtigungen unverändert. Eine bestehende Signatur wird anhand ihres konkreten Zertifikats übernommen und gegen ihre bisherige Signieranforderung geprüft. Ein Wechsel zu Ad-hoc erfolgt nur bei ausdrücklich gesetztem `MAIL_MARKDOWN_SIGNING_IDENTITY=-`.
 
 ```sh
-# Laufende aktuelle App unverändert lassen und v1.0.0 daneben prüfen:
+# Laufende aktuelle App unverändert lassen und die neue Version daneben prüfen:
 zsh scripts/build-app.sh --staging-output "$PWD/dist/release/Mail Markdown.app"
 
 # Vorbereiteten Build samt Applications-Verknüpfung als signiertes DMG verpacken:
@@ -13,6 +13,16 @@ zsh scripts/package-dmg.sh --app "$PWD/dist/release/Mail Markdown.app"
 Ohne `--staging-output` ist das Ziel `dist/Mail Markdown.app`. Eine laufende Ziel-App wird nicht ersetzt. Frühere Builds werden in einem eindeutigen versteckten Backup-Verzeichnis ohne `.app`-Endung erhalten. `--native` beschleunigt einen Entwicklungsbuild für die aktuelle Architektur; der Standard bleibt Universal.
 
 Ein Apple-Development-Build ist für die lokale Prüfung vorbereitet. Er ist keine öffentlich notarisiert veröffentlichte App. Das DMG-Erstellen startet weder die App noch Finder und überträgt keine App-Dateien an Apple. Ein Developer-ID-Build verwendet beim Signieren den erforderlichen Apple-Zeitstempeldienst.
+
+## Oberfläche separat prüfen
+
+```sh
+zsh scripts/build-ui-preview.sh
+```
+
+Der Befehl baut `dist/ui-preview/Mail Markdown UI Preview.app` mit einer eigenen Bundle-ID und expliziter Ad-hoc-Signatur. Diese Entwicklungs-App zeigt denselben Fenster-Controller mit Beispieldaten. Sie greift nicht auf Bedienungshilfen, Tastatureingaben in anderen Apps, die Zwischenablage, Anmeldeobjekte oder gespeicherte Einstellungen zu. Im Menü **Vorschau** lassen sich Hell/Dunkel und Beispielzustände auswählen. Statusangaben sind in diesem Modus Beispieldaten, kein Nachweis einer Mail-Verbindung.
+
+Normale Release-Builds starten weiterhin die produktive Menüleisten-App. Die Vorschau ersetzt keine Installation und verändert ihre Freigaben nicht.
 
 ## App-Icon aus dem SVG erzeugen
 

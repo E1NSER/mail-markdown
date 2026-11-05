@@ -391,7 +391,14 @@ final class MailMarkdownApp: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
 MainActor.assumeIsolated {
     let application = NSApplication.shared
-    let delegate = MailMarkdownApp()
-    application.delegate = delegate
-    withExtendedLifetime(delegate) { application.run() }
+    if ProcessInfo.processInfo.arguments.contains("--ui-preview")
+        || Bundle.main.object(forInfoDictionaryKey: "MailMarkdownUIPreview") as? Bool == true {
+        let delegate = UIPreviewApp()
+        application.delegate = delegate
+        withExtendedLifetime(delegate) { application.run() }
+    } else {
+        let delegate = MailMarkdownApp()
+        application.delegate = delegate
+        withExtendedLifetime(delegate) { application.run() }
+    }
 }

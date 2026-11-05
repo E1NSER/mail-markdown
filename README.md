@@ -6,6 +6,13 @@
 
 Mail Markdown is an independent native macOS companion app by [E1NSER.](https://einser.at). It runs in the menu bar and includes settings, a live Markdown preview and help. There are no subscriptions, formatting quotas, accounts, analytics or remote servers.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/mail-markdown-settings-dark.jpg">
+  <img src="docs/images/mail-markdown-settings-light.jpg" width="900" alt="Mail Markdown 1.1.0 settings with formatting, draft style, Accessibility and launch-at-login controls">
+</picture>
+
+*Native macOS settings in light and dark appearance. Screenshots captured from the 1.1.0 UI preview with an example connection status.*
+
 ## Current status
 
 Public releases provide a **Developer-ID-signed and Apple-notarized Universal DMG** for Apple Silicon and Intel. Download the latest stable version from [GitHub Releases](https://github.com/E1NSER/mail-markdown/releases/latest), open the DMG and drag Mail Markdown into Applications. Each release includes installation notes and a SHA-256 checksum file.
@@ -14,7 +21,7 @@ The fixed [latest installer link](https://github.com/E1NSER/mail-markdown/releas
 
 The current architecture targets direct distribution. It uses Accessibility to read the draft's text style and a keyboard event tap to handle paste. It is installed separately and does not appear in Mail's Extensions settings. See [Mac App Store feasibility](docs/APP_STORE_FEASIBILITY.md) for the sandbox constraints and a possible separate Services implementation.
 
-Design explorations are proposals; they do not represent a shipped UI update.
+Version 1.1.0 implements the Mail Native design with a compact sidebar, native controls and automatic light/dark appearance.
 
 ## Requirements
 
