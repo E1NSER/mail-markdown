@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    { url: "https://mail-markdown.vercel.app", changeFrequency: "monthly", priority: 1 },
-    { url: "https://mail-markdown.vercel.app/datenschutz", changeFrequency: "yearly", priority: 0.2 },
-    { url: "https://mail-markdown.vercel.app/impressum", changeFrequency: "yearly", priority: 0.2 },
+    { url: SITE_URL, changeFrequency: "monthly", priority: 1 },
+    { url: `${SITE_URL}/datenschutz`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/impressum`, changeFrequency: "yearly", priority: 0.2 },
   ];
 }

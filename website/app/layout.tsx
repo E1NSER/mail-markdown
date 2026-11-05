@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, DM_Mono } from "next/font/google";
 import { ConsentProvider } from "@/components/consent-provider";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "./brand.css";
 
@@ -17,7 +18,7 @@ const mono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mail-markdown.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Mail Markdown — Dein Text. Hat Format.",
     template: "%s · Mail Markdown",

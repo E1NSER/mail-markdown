@@ -2,7 +2,7 @@
 
 German landing page for [Mail Markdown](https://github.com/E1NSER/mail-markdown), a free macOS companion for Apple Mail. Built with Next.js 16.4.5, React 19, TypeScript and Motion 14.9.1.
 
-Production: [mail-markdown.vercel.app](https://mail-markdown.vercel.app).
+Production: [markdown-mail.einser.at](https://markdown-mail.einser.at). The [Vercel alias](https://mail-markdown.vercel.app) remains available; canonical metadata and analytics use the custom domain.
 
 The primary action automatically offers the latest public stable Mac release when its approved DMG is available. Until then the download buttons are visibly unavailable, alongside a separate GitHub action; no button redirects an installer request to source code. The app has no subscriptions or usage quotas.
 

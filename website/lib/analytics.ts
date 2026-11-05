@@ -1,5 +1,6 @@
 import { CONSENT_MAX_AGE_MS, isCurrentConsent, type ConsentChoice } from "./consent.ts";
 import { LATEST_DOWNLOAD_URL, RELEASE_ASSET_NAME } from "./release-model.ts";
+import { SITE_URL } from "./site.ts";
 
 export const DENIED_CONSENT = Object.freeze({
   analytics_storage: "denied",
@@ -25,7 +26,7 @@ export function pageContext(path: string): { page_location: string; page_referre
   // document.title, referrers or dynamic/user-controlled path segments.
   const pathname = path.split(/[?#]/, 1)[0];
   return Object.hasOwn(PAGES, pathname)
-    ? { page_location: `https://mail-markdown.vercel.app${pathname}`, page_referrer: "", page_title: PAGES[pathname] }
+    ? { page_location: `${SITE_URL}${pathname}`, page_referrer: "", page_title: PAGES[pathname] }
     : null;
 }
 

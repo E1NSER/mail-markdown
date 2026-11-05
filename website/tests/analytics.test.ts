@@ -95,7 +95,7 @@ test("valid opt-in initializes before events while all advertising consent stays
   assert.equal(config.send_page_view, false);
   assert.equal(config.allow_google_signals, false);
   assert.equal(config.allow_ad_personalization_signals, false);
-  assert.equal(config.page_location, "https://mail-markdown.vercel.app/");
+  assert.equal(config.page_location, "https://markdown-mail.einser.at/");
   assert.equal(config.page_referrer, "");
   assert.equal(config.cookie_domain, "none");
   assert.equal(config.cookie_path, "/");
@@ -162,12 +162,12 @@ test("only public allowlisted routes receive canonical query-free and fragment-f
   for (const path of ["/?email=private@example.org#secret", "/datenschutz?note=EDITOR_SECRET", "/impressum#private"]) {
     const context = pageContext(path)!;
     assert.ok(context);
-    assert.equal(context.page_location, `https://mail-markdown.vercel.app${path.split(/[?#]/, 1)[0]}`);
+    assert.equal(context.page_location, `https://markdown-mail.einser.at${path.split(/[?#]/, 1)[0]}`);
     assert.equal(context.page_referrer, "");
     assert.equal(JSON.stringify(context).includes("private"), false);
     assert.equal(JSON.stringify(context).includes("EDITOR_SECRET"), false);
   }
-  for (const path of ["", "/unknown", "/editor/EDITOR_SECRET", "https://mail-markdown.vercel.app/", "https://evil.example/", "//evil.example/", "javascript:alert(1)", "__proto__", "/impressum/"])
+  for (const path of ["", "/unknown", "/editor/EDITOR_SECRET", "https://markdown-mail.einser.at/", "https://evil.example/", "//evil.example/", "javascript:alert(1)", "__proto__", "/impressum/"])
     assert.equal(pageContext(path), null, path);
 });
 
@@ -210,7 +210,7 @@ test("download events accept only fixed CTA locations and the own release payloa
     assert.equal(payload.link_url, LATEST_DOWNLOAD_URL);
     assert.equal(payload.link_domain, "github.com");
     assert.equal(payload.link_text, "Mail Markdown für macOS");
-    assert.equal(payload.page_location, "https://mail-markdown.vercel.app/");
+    assert.equal(payload.page_location, "https://markdown-mail.einser.at/");
     assert.equal(payload.page_referrer, "");
     assert.equal(JSON.stringify(payload).includes("EDITOR_SECRET"), false);
     assert.deepEqual(Object.keys(payload).sort(), ["cta_location", "file_extension", "file_name", "link_domain", "link_text", "link_url", "page_location", "page_referrer", "page_title", "send_to"]);

@@ -1,6 +1,6 @@
 # Mail Markdown
 
-[Website](https://mail-markdown.vercel.app) · [Build from source](#build-locally) · [Contributing](CONTRIBUTING.md)
+[Website](https://markdown-mail.einser.at) · [Build from source](#build-locally) · [Contributing](CONTRIBUTING.md)
 
 **Free, unlimited Markdown formatting for Apple Mail.** Paste with **⌘V** and keep the font, size and color of your existing draft.
 
