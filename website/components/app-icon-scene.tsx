@@ -12,63 +12,91 @@ import { useCallback, useEffect, useRef } from "react";
 import styles from "./app-icon-scene.module.css";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const incomingRest = { x: "0%", y: "0%", rotate: -4, scale: 1, opacity: 1 };
+const outgoingRest = { x: "0%", y: "0%", rotate: 2, scale: 1, opacity: 1 };
 
 export function AppIconScene() {
   const stage = useRef<HTMLDivElement>(null);
   const hasPlayed = useRef(false);
-  const inView = useInView(stage, { once: true, amount: 0.5 });
+  const playback = useRef(0);
+  const inView = useInView(stage, { once: true, amount: 0.55 });
   const reduced = useReducedMotion();
   const icon = useAnimationControls();
   const incoming = useAnimationControls();
   const outgoing = useAnimationControls();
-  const glow = useAnimationControls();
 
   const stop = useCallback(() => {
+    // Invalidate async continuations before stopping their controls.
+    playback.current += 1;
     icon.stop();
     incoming.stop();
     outgoing.stop();
-    glow.stop();
-  }, [glow, icon, incoming, outgoing]);
+  }, [icon, incoming, outgoing]);
+
+  const showStatic = useCallback(() => {
+    stop();
+    icon.set({ y: 0, scale: 1 });
+    incoming.set({ ...incomingRest, rotate: 0 });
+    outgoing.set({ ...outgoingRest, rotate: 0 });
+  }, [icon, incoming, outgoing, stop]);
 
   const play = useCallback(() => {
-    stop();
-
-    if (reduced) {
-      icon.set({ rotate: 0, y: 0, scale: 1 });
-      incoming.set({ opacity: 0 });
-      outgoing.set({ opacity: 1, x: 0, y: 0, rotate: 6, scale: 1 });
-      glow.set({ opacity: 0.24, scale: 1 });
+    if (reduced !== false) {
+      showStatic();
       return;
     }
+    stop();
+    const current = playback.current;
 
-    void incoming.start({
-      x: [-34, 0, 70, 92],
-      y: [14, -4, -2, 16],
-      rotate: [-13, -9, -3, 0],
-      scale: [0.92, 1, 0.9, 0.7],
-      opacity: [0, 1, 1, 0],
-      transition: { duration: 1.25, times: [0, 0.22, 0.7, 1], ease },
+    async function sequence() {
+      incoming.set(incomingRest);
+      icon.set({ y: 0, scale: 1 });
+      // The server renders the complete composition. Gently clear the previous
+      // result before playback instead of hiding the illustration on load.
+      await outgoing.start({
+        opacity: 0,
+        transition: { type: "tween", duration: 0.14, ease },
+      });
+      if (playback.current !== current) return;
+
+      outgoing.set({ x: "-44%", y: "-18%", rotate: -1, scale: 0.92, opacity: 0 });
+      await Promise.all([
+        incoming.start({
+          x: ["0%", "0%", "55%", "72%"],
+          y: ["0%", "0%", "32%", "64%"],
+          rotate: [-4, -4, -1, 0],
+          scale: [1, 1, 0.96, 0.9],
+          opacity: [1, 1, 1, 0],
+          transition: {
+            type: "tween", duration: 1.25, times: [0, 0.18, 0.72, 1], ease,
+          },
+        }),
+        icon.start({
+          y: [0, -3, 0],
+          scale: [1, 1.012, 1],
+          transition: {
+            type: "tween", duration: 1.2, delay: 0.52, times: [0, 0.35, 1], ease,
+          },
+        }),
+        outgoing.start({
+          opacity: [0, 1, 1],
+          x: ["-44%", "-8%", "0%"],
+          y: ["-18%", "-3%", "0%"],
+          rotate: [-1, 1.8, 2],
+          scale: [0.92, 1, 1],
+          transition: {
+            type: "tween", duration: 1, delay: 0.72, times: [0, 0.78, 1], ease,
+          },
+        }),
+      ]);
+      if (playback.current !== current) return;
+      icon.set({ y: 0, scale: 1 });
+    }
+
+    void sequence().catch(() => {
+      if (playback.current === current) showStatic();
     });
-    void icon.start({
-      rotate: [0, -5, 3, 0],
-      y: [0, -8, -3, 0],
-      scale: [1, 1.04, 1.01, 1],
-      transition: { duration: 2.4, times: [0, 0.3, 0.72, 1], ease },
-    });
-    void outgoing.start({
-      opacity: [0, 0, 1, 1],
-      x: [-60, -35, 0, 0],
-      y: [40, 20, -4, 0],
-      rotate: [-6, 1, 7, 6],
-      scale: [0.82, 0.9, 1, 1],
-      transition: { duration: 2.4, times: [0, 0.42, 0.76, 1], ease },
-    });
-    void glow.start({
-      opacity: [0.18, 0.38, 0.28, 0.24],
-      scale: [0.94, 1.07, 1.03, 1],
-      transition: { duration: 2.6, times: [0, 0.35, 0.7, 1], ease },
-    });
-  }, [glow, icon, incoming, outgoing, reduced, stop]);
+  }, [icon, incoming, outgoing, reduced, showStatic, stop]);
 
   useEffect(() => {
     if (inView && !hasPlayed.current && reduced !== null) {
@@ -78,13 +106,13 @@ export function AppIconScene() {
   }, [inView, play, reduced]);
 
   useEffect(() => {
-    if (reduced) play();
-  }, [play, reduced]);
+    if (reduced) showStatic();
+  }, [reduced, showStatic]);
 
   useEffect(() => stop, [stop]);
 
   function replay() {
-    // A manual replay also consumes the one automatic viewport play.
+    // Manual interaction consumes the automatic viewport play, even before view.
     hasPlayed.current = true;
     play();
   }
@@ -92,7 +120,7 @@ export function AppIconScene() {
   return (
     <figure className={styles.scene}>
       <div ref={stage} className={styles.stage} aria-hidden="true">
-        <motion.div className={styles.glow} animate={glow} initial={false} />
+        <div className={styles.light} />
         <div className={styles.ground} />
         <motion.div
           className={`${styles.paper} ${styles.incoming}`}
@@ -105,22 +133,16 @@ export function AppIconScene() {
           <span className={styles.paperLine} />
         </motion.div>
         <div className={styles.iconAnchor}>
-          <motion.div animate={icon} initial={false}>
-            <motion.div
-              className={styles.iconHover}
-              whileHover={reduced ? undefined : { rotate: -3, y: -4 }}
-              transition={{ duration: reduced ? 0 : 0.4, ease }}
-            >
-              <Image
-                src="/app-icon.svg"
-                alt=""
-                width={352}
-                height={352}
-                sizes="(max-width: 600px) 64vw, 320px"
-                draggable={false}
-                unoptimized
-              />
-            </motion.div>
+          <motion.div className={styles.iconBody} animate={icon} initial={false}>
+            <Image
+              src="/app-icon.svg"
+              alt=""
+              width={352}
+              height={352}
+              sizes="(max-width: 600px) 64vw, 312px"
+              draggable={false}
+              unoptimized
+            />
           </motion.div>
         </div>
         <motion.div
@@ -135,7 +157,7 @@ export function AppIconScene() {
         </motion.div>
       </div>
       <figcaption className={styles.caption}>
-        Markdown rein. <span>Mail fertig.</span>
+        Markdown rein. <span>Mail mit Format.</span>
       </figcaption>
       <button type="button" className={styles.replay} onClick={replay}>
         <RotateCcw size={14} aria-hidden="true" />

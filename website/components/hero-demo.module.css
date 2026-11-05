@@ -1,0 +1,75 @@
+.scene {
+  perspective: 1100px;
+}
+.window {
+  transform-origin: 50% 46%;
+  backface-visibility: hidden;
+}
+.previewLayers {
+  display: grid;
+  align-items: start;
+}
+.message {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.message[aria-hidden="true"] {
+  pointer-events: none;
+  user-select: none;
+}
+.line {
+  display: block;
+}
+.statusSymbol {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: #1d7a4b;
+}
+.statusSymbol > * {
+  grid-area: 1 / 1;
+}
+.statusDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #adb5bf;
+}
+.key.key {
+  transition: none;
+}
+.key.key:hover,
+.key.key:active {
+  transform: none;
+  border-bottom-width: 5px;
+}
+.replay.replay {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 0;
+  padding: 0;
+  color: #fff;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  font-size: 10px;
+  white-space: nowrap;
+  text-underline-offset: 4px;
+}
+.replay:hover {
+  text-decoration: underline;
+}
+.replay:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .window {
+    transform: none !important;
+  }
+}

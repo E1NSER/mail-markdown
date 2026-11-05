@@ -1,5 +1,5 @@
 .scene {
-  width: min(100%, 500px);
+  width: min(100%, 520px);
   min-width: 0;
   margin: 0 auto;
   display: flex;
@@ -12,51 +12,46 @@
   position: relative;
   isolation: isolate;
   width: 100%;
-  min-height: 300px;
-  aspect-ratio: 1.15;
-  overflow: hidden;
+  min-height: 315px;
+  aspect-ratio: 1.1;
+  overflow: visible;
 }
 
-.glow {
+.light {
   position: absolute;
-  inset: 8% 5% 5%;
-  z-index: -1;
+  inset: 24% 12% 8%;
+  z-index: 0;
   border-radius: 50%;
-  background: radial-gradient(
-    ellipse,
-    #2188f36b,
-    #2188f314 48%,
-    transparent 72%
-  );
-  opacity: 0.24;
+  background: radial-gradient(ellipse, #2188f31a, #2188f306 50%, transparent 72%);
   pointer-events: none;
 }
 
 .ground {
   position: absolute;
-  left: 24%;
-  right: 24%;
-  bottom: 16%;
-  height: 8%;
+  left: 27%;
+  right: 25%;
+  bottom: 10%;
+  height: 4%;
   border-radius: 50%;
-  background: radial-gradient(ellipse, #235a9b1a, transparent 70%);
+  background: radial-gradient(ellipse, #163c791c, transparent 70%);
   pointer-events: none;
 }
 
 .iconAnchor {
   position: absolute;
-  top: 10%;
+  top: 26%;
   left: 18%;
   width: 64%;
   z-index: 2;
+  pointer-events: none;
 }
 
-.iconHover {
+.iconBody {
   width: 100%;
   transform-origin: 50% 75%;
 }
 
-.iconHover img {
+.iconBody img {
   display: block;
   width: 100%;
   height: auto;
@@ -67,55 +62,52 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  width: 34%;
-  padding: clamp(11px, 2vw, 19px);
+  gap: 6px;
+  padding: clamp(12px, 3vw, 17px);
   border: 1px solid var(--line);
-  border-radius: 5px 18px 5px 5px;
+  border-radius: 8px;
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 12px 24px -13px #163c7940;
+  box-shadow:
+    0 20px 30px -24px #163c7952,
+    0 2px 5px -2px #163c7914,
+    inset 0 1px #ffffff45;
   line-height: 1.45;
+  transform-origin: 50% 60%;
   pointer-events: none;
   user-select: none;
 }
 
-.paper::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 17px;
-  height: 17px;
-  border-radius: 0 17px 0 3px;
-  background: linear-gradient(45deg, var(--blue-wash) 50%, transparent 50%);
-}
-
+/* The Markdown sheet travels behind the icon's solid tile during playback. */
 .incoming {
-  top: 28%;
-  left: 3%;
+  top: 6%;
+  left: 2%;
+  width: 44%;
   z-index: 1;
-  opacity: 0;
+  opacity: 1;
+  transform: rotate(-4deg);
 }
 
 .incoming code {
   font-family: var(--font-mono), monospace;
-  font-size: clamp(8px, 1.3vw, 12px);
+  font-size: 12px;
   white-space: nowrap;
 }
 
+/* The formatted result emerges from the icon's front and settles here. */
 .outgoing {
-  top: 52%;
-  right: 3%;
+  top: 53%;
+  right: 2%;
+  width: 48%;
   z-index: 3;
   opacity: 1;
-  transform: rotate(6deg);
+  transform: rotate(2deg);
 }
 
 .outgoing strong,
 .outgoing em {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(13px, 1.7vw, 17px);
+  font-size: clamp(15px, 2vw, 18px);
 }
 
 .outgoing strong {
@@ -127,26 +119,25 @@
 }
 
 .paperLabel {
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   font-family: var(--font-mono), monospace;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--muted);
 }
 
 .paperLine {
   display: block;
-  width: 72%;
-  height: 2px;
-  margin-top: 7px;
-  border-radius: 2px;
+  width: 64%;
+  height: 1px;
+  margin-top: 6px;
   background: var(--line);
 }
 
 .caption {
   max-width: 100%;
-  margin-top: -5px;
+  margin-top: 16px;
   text-align: center;
   text-wrap: balance;
   font-size: clamp(19px, 2.2vw, 25px);
@@ -165,36 +156,61 @@
   justify-content: center;
   gap: 8px;
   max-width: 100%;
+  min-width: 44px;
   min-height: 44px;
-  margin-top: 12px;
-  padding: 9px 15px;
-  border: 1px solid var(--line);
+  margin-top: 10px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
   color: var(--muted);
-  font:
-    500 12px/1.4 var(--font-sans),
-    sans-serif;
+  font: 500 12px/1.4 var(--font-sans), sans-serif;
   text-align: center;
   cursor: pointer;
-  transition:
-    background 180ms,
-    color 180ms,
-    border-color 180ms;
+  transition: color 160ms, background 160ms, border-color 160ms;
 }
 
 .replay:hover {
   background: var(--surface);
   color: var(--ink);
-  border-color: var(--accent);
+  border-color: var(--line);
 }
 
 .replay:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 4px;
+  outline-offset: 3px;
+}
+
+@media (min-width: 540px) {
+  .stage {
+    min-height: 340px;
+    aspect-ratio: 1.28;
+  }
+
+  .iconAnchor {
+    top: 17%;
+    left: 20%;
+    width: 60%;
+  }
+
+  .incoming {
+    width: 40%;
+  }
+
+  .outgoing {
+    width: 43%;
+    top: 54%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .incoming,
+  .outgoing,
+  .iconBody {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
   .replay {
     transition: none;
   }

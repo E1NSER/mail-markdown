@@ -39,6 +39,8 @@ Manrope and DM Mono use `next/font`: font files are fetched at build time and se
 
 CSS handles small transitions; Motion handles the product demo and section reveals. Components use `useReducedMotion`, with a reduced-motion provider and CSS preference handling.
 
+The hero stages a single conversion when it enters view: key press, Markdown exit, formatted lines, then completion feedback. Replay and font controls interrupt pending steps immediately. Fine mouse pointers add restrained spring depth; touch, keyboard focus and reduced motion keep the window still. The icon scene uses a separate one-shot sequence to move a Markdown sheet behind the icon and bring the formatted mail forward. Neither scene runs an idle loop.
+
 `Reveal` keeps server-rendered content visible. After hydration, it enhances only offscreen sections with an entrance animation. Preserve this behavior so the page remains readable without JavaScript. Check keyboard access, narrow screens and reduced motion when changing interactions.
 
 ## Vercel
