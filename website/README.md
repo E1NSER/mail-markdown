@@ -65,7 +65,7 @@ No release, a release missing its DMG, and a temporarily unavailable GitHub API 
 
 ## Reference notes
 
-The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a working native Mail specimen and an animated app-icon composition. The hero offers a font switch and an explicit formatting toggle; it plays the conversion once. Subtle Markdown syntax drifts in the background with a pause control and a static reduced-motion alternative. The editable playground remains local. GitHub star counts are read server-side with five-minute caching; missing metadata hides the count instead of inventing one.
+The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a working native Mail specimen and an animated app-icon composition. The hero keeps a clean blue background and offers a font switch and an explicit formatting toggle; it plays the conversion once. The editable playground remains local. GitHub star counts are read server-side with five-minute caching; missing metadata hides the count instead of inventing one.
 
 - [Superlist on Awwwards](https://www.awwwards.com/sites/superlist): concentrated brand color, large typography and a single product composition. [Button interaction reference](https://www.awwwards.com/inspiration/superlist-notification-button).
 - [Tezuka Reader in the Webflow Showcase](https://webflow.com/made-in-webflow/website/tezuka-reader), [live site](https://tezuka-xr.webflow.io/): native interface language and a large, focused product view.

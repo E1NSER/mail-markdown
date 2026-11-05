@@ -9,7 +9,6 @@ import { MotionProvider, Reveal } from "@/components/motion";
 import { DownloadButton } from "@/components/download-button";
 import { GitHubButton } from "@/components/github-button";
 import { AppIconScene } from "@/components/app-icon-scene";
-import { MarkdownBackdrop } from "@/components/markdown-backdrop";
 import { CookieSettingsButton } from "@/components/consent-provider";
 import { getRepositoryStars } from "@/lib/github-repository";
 import { getLatestRelease } from "@/lib/github-release";
@@ -71,7 +70,6 @@ export default async function Home() {
         <SiteNav downloadAvailable={downloadAvailable} stars={stars} />
         <main id="inhalt">
           <div className="hero-band">
-            <MarkdownBackdrop />
             <section className="hero section-wrap" aria-labelledby="hero-title">
               <div className="hero-copy">
                 <div className="eyebrow hero-eyebrow">
