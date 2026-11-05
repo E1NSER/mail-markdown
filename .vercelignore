@@ -1,0 +1,10 @@
+# Deploy the website from the repository root, with Root Directory = website.
+/*
+!website
+
+# Keep local dependencies, build output and environment files off Vercel.
+website/node_modules
+website/.next
+website/.vercel
+website/.env*
+website/*.tsbuildinfo

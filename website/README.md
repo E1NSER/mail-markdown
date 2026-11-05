@@ -44,6 +44,7 @@ CSS handles small transitions; Motion handles the product demo and section revea
 - Project: `e1nser-team/mail-markdown`.
 - Root Directory: `website`; framework: Next.js; Node.js: 24.
 - GitHub `main` is configured for automatic production deployments.
+- The repository-root `.vercelignore` uploads only website sources for CLI deployments; native builds, signing preparation, dependencies, local caches and environment files stay local.
 
 For a manual CLI deployment, run the command from the **repository root**, because Vercel applies the configured `website` Root Directory:
 
