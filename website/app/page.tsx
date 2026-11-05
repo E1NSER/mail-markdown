@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   ArrowDown,
   ArrowUpRight,
-  Check,
   Code2,
   Command,
   Heart,
@@ -17,6 +16,9 @@ import { HeroDemo } from "@/components/hero-demo";
 import { Playground } from "@/components/playground";
 import { MotionProvider, Reveal } from "@/components/motion";
 import { DownloadButton } from "@/components/download-button";
+import { GitHubButton } from "@/components/github-button";
+import { AppIconScene } from "@/components/app-icon-scene";
+import { getRepositoryStars } from "@/lib/github-repository";
 import { getLatestRelease } from "@/lib/github-release";
 import { RELEASES_URL, type ReleaseState } from "@/lib/release-model";
 
@@ -61,7 +63,10 @@ function getFaqs(release: ReleaseState) {
 }
 
 export default async function Home() {
-  const release = await getLatestRelease();
+  const [release, stars] = await Promise.all([
+    getLatestRelease(),
+    getRepositoryStars(),
+  ]);
   const downloadAvailable = release.status === "available";
   const faqs = getFaqs(release);
   return (
@@ -70,7 +75,7 @@ export default async function Home() {
         Zum Inhalt
       </a>
       <div className="site-shell">
-        <SiteNav downloadAvailable={downloadAvailable} />
+        <SiteNav downloadAvailable={downloadAvailable} stars={stars} />
         <main id="inhalt">
           <div className="hero-band">
             <section className="hero section-wrap" aria-labelledby="hero-title">
@@ -105,81 +110,14 @@ export default async function Home() {
                 </div>
               </div>
               <HeroDemo />
-              <div className="hero-footnote">
-                <span>EIN KLEINES TOOL. EIN GUTER HANDGRIFF.</span>
-                <a href="#so-gehts">
-                  Runterscrollen <ArrowDown size={14} />
-                </a>
-              </div>
             </section>
           </div>
-
-          <section className="workflow-section section-wrap" id="so-gehts">
-            <Reveal className="workflow-heading">
-              <div className="eyebrow">01 — WENIGER HANDARBEIT</div>
-              <h2>
-                Für Gedanken.
-                <br />
-                Nicht fürs Formatieren.
-              </h2>
-              <p>
-                Dein Editor kann Markdown. Mail kann deinen Stil.
-                <br />
-                Wir bringen die beiden zusammen.
-              </p>
-            </Reveal>
-            <div className="workflow-rows">
-              <Reveal className="workflow-row">
-                <span className="workflow-number">01</span>
-                <div>
-                  <h3>Schreib, wo du willst.</h3>
-                  <p>
-                    Im Editor, in deinen Notizen oder im KI-Chat. Kopiere deinen
-                    Markdown-Text.
-                  </p>
-                </div>
-                <span className="workflow-sample raw-sample" aria-hidden="true">
-                  **Gute Idee.**
-                </span>
-              </Reveal>
-              <Reveal className="workflow-row">
-                <span className="workflow-number">02</span>
-                <div>
-                  <h3>Einfügen wie immer.</h3>
-                  <p>
-                    Cursor in den Nachrichtentext setzen. ⌘V drücken. Das war’s.
-                  </p>
-                </div>
-                <span className="workflow-sample key-sample" aria-hidden="true">
-                  <kbd>⌘</kbd>
-                  <kbd>V</kbd>
-                </span>
-              </Reveal>
-              <Reveal className="workflow-row">
-                <span className="workflow-number">03</span>
-                <div>
-                  <h3>Sieht nach dir aus.</h3>
-                  <p>
-                    Fett, kursiv, Listen und Links. Mit dem bestehenden Textstil
-                    deines Entwurfs.
-                  </p>
-                </div>
-                <span
-                  className="workflow-sample finished-sample"
-                  aria-hidden="true"
-                >
-                  Gute Idee.
-                  <Check size={22} />
-                </span>
-              </Reveal>
-            </div>
-          </section>
 
           <section className="play-section" id="spielplatz">
             <div className="section-wrap">
               <Reveal className="play-heading">
                 <div>
-                  <div className="eyebrow">02 — SELBST IST DER CURSOR</div>
+                  <div className="eyebrow">01 — SELBST IST DER CURSOR</div>
                   <h2>
                     Mach’s zu
                     <br />
@@ -187,9 +125,20 @@ export default async function Home() {
                   </h2>
                 </div>
                 <div className="play-intro">
-                  <span className="play-doodle" aria-hidden="true">
-                    ↘
-                  </span>
+                  <svg
+                    className="play-doodle"
+                    viewBox="0 0 126 116"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M15 12C96 -6 122 48 66 87C57 94 42 98 28 98M28 98L42 77M28 98L54 102"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                   <p>
                     Schreib links. Schau rechts.
                     <br />
@@ -218,7 +167,7 @@ export default async function Home() {
 
           <section className="principles-section section-wrap">
             <Reveal className="principles-head">
-              <div className="eyebrow">03 — PASST IN DEINEN ALLTAG</div>
+              <div className="eyebrow">02 — PASST IN DEINEN ALLTAG</div>
               <h2>
                 Kleine App.
                 <br />
@@ -285,31 +234,21 @@ export default async function Home() {
                   Ein kostenloses Projekt von E1NSER. Schau in den Code, melde
                   einen Fehler oder mach deine eigene Idee daraus.
                 </p>
-                <a
-                  href={repo}
-                  className="button button-dark"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Zum GitHub-Repo <ArrowUpRight size={18} />
-                </a>
-              </Reveal>
-              <Reveal className="source-signature">
-                <span className="source-mark" aria-hidden="true">
-                  M↓
-                </span>
-                <span>Mail Markdown</span>
-                <div>
-                  <span>SWIFT + APPKIT</span>
-                  <span>MIT LICENSE ↗</span>
+                <div className="section-actions">
+                  <DownloadButton
+                    className="button button-primary"
+                    available={downloadAvailable}
+                  />
+                  <GitHubButton className="button button-outline" />
                 </div>
               </Reveal>
+              <AppIconScene />
             </div>
           </section>
 
           <section className="faq-section section-wrap">
             <Reveal className="faq-heading">
-              <div className="eyebrow">04 — GUT ZU WISSEN</div>
+              <div className="eyebrow">03 — GUT ZU WISSEN</div>
               <h2>Die Details.</h2>
               <p>Die Details, bevor du loslegst.</p>
             </Reveal>
@@ -341,12 +280,14 @@ export default async function Home() {
                 <span>gutes Format.</span>
               </h2>
               <p>Kostenlos. Unbegrenzt. Für deinen Mac.</p>
-              <DownloadButton
-                className="button button-primary"
-                available={downloadAvailable}
-                sourceFallback
-              />
-              <span className="start-note">
+              <div className="section-actions start-actions">
+                <DownloadButton
+                  className="button button-primary"
+                  available={downloadAvailable}
+                />
+                <GitHubButton className="button button-outline" />
+              </div>
+              <span className="start-note" id="download-availability">
                 {release.status === "available" ? (
                   <>
                     {release.version} · Universal-DMG · kostenlos
@@ -359,7 +300,7 @@ export default async function Home() {
                   <>
                     Der erste öffentliche Mac-Release wird vorbereitet.
                     <br />
-                    Bis dahin kannst du die App selbst bauen.
+                    Den Quellcode findest du auf GitHub.
                   </>
                 ) : release.status === "no-download" ? (
                   <>

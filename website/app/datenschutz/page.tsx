@@ -118,9 +118,10 @@ export default function DatenschutzPage() {
       <section>
         <h2>Externe Links und Support</h2>
         <p>
-          Für den Download-Status ruft unser Server öffentliche Release-Daten
-          von GitHub ab. Deine Eingaben im Playground werden dabei nicht
-          übertragen. Der eigentliche App-Download erfolgt direkt bei GitHub.
+          Für den Download-Status und die Sternezahl ruft unser Server
+          öffentliche Release- und Repository-Daten von GitHub ab. Deine
+          Eingaben im Playground werden dabei nicht übertragen. Der eigentliche
+          App-Download erfolgt direkt bei GitHub.
         </p>
         <p>
           Quellcode, Downloads und Fehlerberichte liegen bei GitHub. Erst wenn

@@ -4,7 +4,7 @@ German landing page for [Mail Markdown](https://github.com/E1NSER/mail-markdown)
 
 Production: [mail-markdown.vercel.app](https://mail-markdown.vercel.app).
 
-The primary action automatically offers the latest public stable Mac release when its approved DMG is available. Until then the page shows the release status and source-build instructions. The app has no subscriptions or usage quotas.
+The primary action automatically offers the latest public stable Mac release when its approved DMG is available. Until then the download buttons are visibly unavailable, alongside a separate GitHub action; no button redirects an installer request to source code. The app has no subscriptions or usage quotas.
 
 ## Local development
 
@@ -62,7 +62,7 @@ No release, a release missing its DMG, and a temporarily unavailable GitHub API 
 
 ## Reference notes
 
-The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a working native Mail specimen and ruled workflow rows. The hero offers a font switch and an explicit formatting toggle; it plays the conversion once, with no decorative animation loop. The editable playground remains local.
+The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a working native Mail specimen and an animated app-icon composition. The hero offers a font switch and an explicit formatting toggle; it plays the conversion once, with no decorative animation loop. The editable playground remains local. GitHub star counts are read server-side with five-minute caching; missing metadata hides the count instead of inventing one.
 
 - [Superlist on Awwwards](https://www.awwwards.com/sites/superlist): concentrated brand color, large typography and a single product composition. [Button interaction reference](https://www.awwwards.com/inspiration/superlist-notification-button).
 - [Tezuka Reader in the Webflow Showcase](https://webflow.com/made-in-webflow/website/tezuka-reader), [live site](https://tezuka-xr.webflow.io/): native interface language and a large, focused product view.

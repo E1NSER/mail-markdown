@@ -1,34 +1,34 @@
-import { ArrowDown, ArrowUpRight, Download } from "lucide-react";
-import { LATEST_DOWNLOAD_URL, SOURCE_BUILD_URL } from "@/lib/release-model";
+import { Download } from "lucide-react";
+import { LATEST_DOWNLOAD_URL } from "@/lib/release-model";
 
 export function DownloadButton({
   available,
   className,
-  sourceFallback = false,
+  compact = false,
 }: {
   available: boolean;
   className: string;
-  sourceFallback?: boolean;
+  compact?: boolean;
 }) {
-  const href = available
-    ? LATEST_DOWNLOAD_URL
-    : sourceFallback
-      ? SOURCE_BUILD_URL
-      : "#starten";
-  const label = available
-    ? "Für macOS laden"
-    : sourceFallback
-      ? "App selbst bauen"
-      : "Download-Status";
-  const Icon = available ? Download : sourceFallback ? ArrowUpRight : ArrowDown;
+  if (!available) {
+    return (
+      <button
+        type="button"
+        className={`${className} download-pending`}
+        disabled
+        aria-describedby="download-availability"
+        title="Der Mac-Download ist hier derzeit nicht verfügbar."
+      >
+        <Download size={17} aria-hidden="true" />
+        <span>{compact ? "Download" : "Download folgt"}</span>
+        {compact && <span className="download-soon">bald</span>}
+      </button>
+    );
+  }
   return (
-    <a
-      className={className}
-      href={href}
-      target={!available && sourceFallback ? "_blank" : undefined}
-      rel={!available && sourceFallback ? "noreferrer" : undefined}
-    >
-      {label} <Icon size={18} />
+    <a className={className} href={LATEST_DOWNLOAD_URL}>
+      <Download size={17} aria-hidden="true" />
+      <span>{compact ? "Download" : "Für macOS laden"}</span>
     </a>
   );
 }

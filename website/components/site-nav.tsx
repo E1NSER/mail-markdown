@@ -4,9 +4,15 @@ import Image from "next/image";
 import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DownloadButton } from "./download-button";
-import { LATEST_DOWNLOAD_URL } from "@/lib/release-model";
+import { GitHubButton } from "./github-button";
 
-export function SiteNav({ downloadAvailable }: { downloadAvailable: boolean }) {
+export function SiteNav({
+  downloadAvailable,
+  stars,
+}: {
+  downloadAvailable: boolean;
+  stars: number | null;
+}) {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
   useEffect(() => {
@@ -35,11 +41,16 @@ export function SiteNav({ downloadAvailable }: { downloadAvailable: boolean }) {
         </span>
       </a>
       <nav className="desktop-nav" aria-label="Hauptnavigation">
-        <a href="#so-gehts">So funktioniert’s</a>
         <a href="#spielplatz">Ausprobieren</a>
         <a href="#open-source">Open Source</a>
       </nav>
       <div className="nav-actions">
+        <GitHubButton className="nav-github" stars={stars} showStars />
+        <DownloadButton
+          className="nav-cta"
+          available={downloadAvailable}
+          compact
+        />
         <button
           className="icon-button theme-toggle"
           onClick={toggleTheme}
@@ -47,7 +58,6 @@ export function SiteNav({ downloadAvailable }: { downloadAvailable: boolean }) {
         >
           {dark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        <DownloadButton className="nav-cta" available={downloadAvailable} />
         <button
           className="icon-button mobile-menu-button"
           onClick={() => setOpen(!open)}
@@ -64,22 +74,19 @@ export function SiteNav({ downloadAvailable }: { downloadAvailable: boolean }) {
           className="mobile-menu"
           aria-label="Mobile Navigation"
         >
-          <a onClick={() => setOpen(false)} href="#so-gehts">
-            So funktioniert’s <ArrowUpRight size={18} />
-          </a>
           <a onClick={() => setOpen(false)} href="#spielplatz">
             Ausprobieren <ArrowUpRight size={18} />
           </a>
           <a onClick={() => setOpen(false)} href="#open-source">
             Open Source <ArrowUpRight size={18} />
           </a>
-          <a
-            onClick={() => setOpen(false)}
-            href={downloadAvailable ? LATEST_DOWNLOAD_URL : "#starten"}
-          >
-            {downloadAvailable ? "Für macOS laden" : "Download-Status"}{" "}
-            <ArrowUpRight size={18} />
+          <a onClick={() => setOpen(false)} href="#starten">
+            App für macOS <ArrowUpRight size={18} />
           </a>
+          <button className="mobile-theme-toggle" onClick={toggleTheme}>
+            {dark ? "Helle Darstellung" : "Dunkle Darstellung"}
+            {dark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
         </nav>
       )}
     </header>
