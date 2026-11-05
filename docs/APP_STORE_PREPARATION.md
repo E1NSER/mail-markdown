@@ -125,7 +125,7 @@ Service-Name, tatsächlichen Menüpfad und Testverhalten vor Übernahme mit dem 
 - [ ] Produktentscheidung für den expliziten Services-Ablauf bestätigen; aktuelle automatische ⌘V-App unverändert erhalten.
 - [ ] Separaten sandboxfähigen Services-Build implementieren und in Mail testen; keine AX-Steuerung oder synthetische Tastatureingabe im Store-Build.
 - [ ] Schriftübernahme, Auswahlersetzung, Rückgängig, Fokuswechsel und Plain-Text-Fehlerfälle nachweisen.
-- [ ] App-Store-App-Signatur, Provisioning und Installer-Signatur vorbereiten. Die nötige **Mac Installer Distribution**-Identität fehlt derzeit; ein Apple-Development-Build ist kein Store-Distributionspaket. [Apple-Zertifikatstypen](https://developer.apple.com/help/account/certificates/certificates-overview)
+- [ ] App-Store-App-Signatur, Provisioning und Installer-Signatur für den separaten Store-Build vorbereiten und prüfen. Dafür werden die passenden Store-Distributionsidentitäten benötigt, einschließlich **Mac Installer Distribution**; Developer ID Application und Apple Development ersetzen diese nicht. [Apple-Zertifikatstypen](https://developer.apple.com/help/account/certificates/certificates-overview)
 - [ ] Öffentliches Repository, Supportkontakt und Datenschutzseite veröffentlichen und Links in der App ergänzen.
 - [ ] Finale App-Privacy-Antworten, Privacy Manifest und Required-Reason-APIs prüfen; der aktuelle Code verwendet unter anderem `UserDefaults`.
 - [ ] App-Store-Screenshots der tatsächlich eingereichten App aufnehmen; Figma-Konzepte nicht als fertige App ausgeben.

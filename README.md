@@ -1,6 +1,6 @@
 # Mail Markdown
 
-[Website](https://markdown-mail.einser.at) · [Build from source](#build-locally) · [Contributing](CONTRIBUTING.md)
+[Website](https://markdown-mail.einser.at) · [Download for macOS](https://github.com/E1NSER/mail-markdown/releases/latest/download/Mail-Markdown-universal-notarized.dmg) · [Releases](https://github.com/E1NSER/mail-markdown/releases) · [Build from source](#build-locally) · [Contributing](CONTRIBUTING.md)
 
 **Free, unlimited Markdown formatting for Apple Mail.** Paste with **⌘V** and keep the font, size and color of your existing draft.
 
@@ -8,7 +8,9 @@ Mail Markdown is an independent native macOS companion app by [E1NSER.](https://
 
 ## Current status
 
-The app works locally; a public, notarized binary release has **not** been prepared. Build from source using the instructions below. Local Apple Development and ad-hoc builds are for testing, not evidence of a notarized public release.
+Public releases provide a **Developer-ID-signed and Apple-notarized Universal DMG** for Apple Silicon and Intel. Download the latest stable version from [GitHub Releases](https://github.com/E1NSER/mail-markdown/releases/latest), open the DMG and drag Mail Markdown into Applications. Each release includes installation notes and a SHA-256 checksum file.
+
+The fixed [latest installer link](https://github.com/E1NSER/mail-markdown/releases/latest/download/Mail-Markdown-universal-notarized.dmg) always follows the current stable release. Local Apple Development and ad-hoc builds remain development builds; they do not establish notarization.
 
 The current architecture targets direct distribution. It uses Accessibility to read the draft's text style and a keyboard event tap to handle paste. It is installed separately and does not appear in Mail's Extensions settings. See [Mac App Store feasibility](docs/APP_STORE_FEASIBILITY.md) for the sandbox constraints and a possible separate Services implementation.
 
@@ -65,6 +67,8 @@ If an update leaves Accessibility permission apparently enabled but the app repo
 ## Privacy
 
 Message and clipboard contents are processed on your Mac, without telemetry or a backend. Clipboard recovery temporarily retains the original in memory; conversion replaces the general clipboard until you restore it or copy something new. The app does not write message or clipboard contents to files or upload them. Operational logs contain status, Accessibility roles and process IDs, not message text. See [PRIVACY.md](PRIVACY.md).
+
+The separate [website](https://markdown-mail.einser.at) offers optional, consent-gated statistics; its [privacy notice](https://markdown-mail.einser.at/datenschutz) describes that processing. Website analytics are not part of the native app.
 
 ## Development and verification
 

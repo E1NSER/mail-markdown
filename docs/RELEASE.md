@@ -1,6 +1,6 @@
 # Mail Markdown veröffentlichen
 
-Der aktuelle lokale Build ist mit **Apple Development** signiert. Er ist **nicht notarisiert** und noch kein öffentlicher Release. Ein funktionierendes DMG und eine gültige lokale Signatur ersetzen die Developer-ID-Signatur und Apples Notarisierung nicht.
+Öffentliche Release-Builds benötigen eine **Developer ID Application**-Signatur und eine erfolgreich abgeschlossene Apple-Notarisierung. Ein funktionierendes DMG oder eine lokale Apple-Development- bzw. Ad-hoc-Signatur allein belegen keinen geprüften öffentlichen Release. Maßgeblich sind die Ergebnisse des jeweiligen Notarisierungs- und Validierungslaufs.
 
 Für die reguläre Verteilung außerhalb des Mac App Store ist eine **Developer ID Application**-Identität vorgesehen. Apple unterscheidet diese ausdrücklich von Entwicklungszertifikaten. Siehe [Developer-ID-Verteilung](https://developer.apple.com/developer-id/) und [Zertifikatstypen](https://developer.apple.com/help/account/certificates/certificates-overview).
 
