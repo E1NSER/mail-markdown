@@ -62,17 +62,11 @@ No release, a release missing its DMG, and a temporarily unavailable GitHub API 
 
 ## Reference notes
 
-The current visual direction uses pearl surfaces, ink navy, italic Georgia accents and an original envelope-shaped product stage. The split hero, Mail illustration and keyboard interaction keep it distinct from the reference.
+The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a working native Mail specimen and ruled workflow rows. The hero offers a font switch and an explicit formatting toggle; it plays the conversion once, with no decorative animation loop. The editable playground remains local.
 
-- [Calendly hero](https://mobbin.com/sites/sections/1aecb2bd-9275-46c8-bd6a-ab20e3847941): warm framing, navy type and dark actions.
-- [Calendly feature section](https://mobbin.com/sites/sections/959d4e5e-ecc6-4995-b084-ed17dc74724f): serif section typography and a large, concentrated illustration area.
+- [Superlist on Awwwards](https://www.awwwards.com/sites/superlist): concentrated brand color, large typography and a single product composition. [Button interaction reference](https://www.awwwards.com/inspiration/superlist-notification-button).
+- [Tezuka Reader in the Webflow Showcase](https://webflow.com/made-in-webflow/website/tezuka-reader), [live site](https://tezuka-xr.webflow.io/): native interface language and a large, focused product view.
 
-These inspected Mobbin captures informed the layout. They are static references and do not establish animation or interaction behavior:
-
-- [Sketch](https://mobbin.com/sites/sections/a8e27ceb-5766-47e1-922e-e320d5a95fa0?utm_source=chatgpt&utm_medium=ai-assistant&utm_source_platform=mcp): centered Mac-focused headline, a feature chooser and a large application window.
-- [Norma](https://mobbin.com/sites/sections/e2c98980-269f-432e-a8bc-55c981de2359?utm_source=chatgpt&utm_medium=ai-assistant&utm_source_platform=mcp): short utility copy, compact primary/secondary actions and a readable desktop proof image.
-- [Dabbit](https://mobbin.com/sites/sections/b04c25e2-2f79-4c91-b926-3c4d41b7b201?utm_source=chatgpt&utm_medium=ai-assistant&utm_source_platform=mcp): a compact claim beside a spacious example surface with a cursor and output value.
-
-The editable Markdown-to-Mail demonstration and its motion are project design decisions.
+These are layout and interaction references. The palette, copy, artwork and Markdown-to-Mail interaction are specific to this project; no reference assets are included.
 
 Created by [E1NSER.](https://einser.at). Project code is covered by the repository's [MIT License](../LICENSE).

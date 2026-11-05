@@ -1,71 +1,61 @@
 "use client";
 
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
-import { ArrowUpRight, Check, ChevronDown, Send } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ChevronDown, Send } from "lucide-react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+
+const rawMarkdown =
+  "**Hey Alex,**\n\ngute Nachrichten.\nDas Design ist *fertig*.\n\n- Ein klarer Plan.\n- Ein schönes Ergebnis.\n- Und ein bisschen weniger Arbeit.\n\nLiebe Grüße\nSam";
+
+const demoFonts = {
+  Georgia: 'Georgia, "Times New Roman", serif',
+  Helvetica: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+} as const;
+type DemoFont = keyof typeof demoFonts;
+const fontNames = Object.keys(demoFonts) as DemoFont[];
 
 export function HeroDemo() {
   const [formatted, setFormatted] = useState(false);
+  const [font, setFont] = useState<DemoFont>("Georgia");
   const reduced = useReducedMotion();
-  const scene = useRef<HTMLDivElement>(null);
   const autoRun = useRef<number | undefined>(undefined);
-  const { scrollYProgress } = useScroll({
-    target: scene,
-    offset: ["start start", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [0, -45]);
+
   useEffect(() => {
     autoRun.current = window.setTimeout(() => setFormatted(true), 1800);
     return () => window.clearTimeout(autoRun.current);
   }, []);
-  function toggleDemo() {
+
+  function cancelAutoFormat() {
     window.clearTimeout(autoRun.current);
+    autoRun.current = undefined;
+  }
+
+  function toggleDemo() {
+    cancelAutoFormat();
     setFormatted((value) => !value);
+  }
+
+  function selectFont(nextFont: DemoFont) {
+    cancelAutoFormat();
+    setFont(nextFont);
   }
 
   return (
     <div
       className="hero-scene"
-      ref={scene}
-      aria-label="Animierte Beispieldarstellung eines Mail-Entwurfs"
+      role="group"
+      aria-label="Interaktive Demo: Markdown in Apple Mail formatieren"
     >
-      <div className="mail-stage" aria-hidden="true">
-        <svg viewBox="0 0 600 500" fill="none" preserveAspectRatio="none">
-          <path d="M24 78 300 285 576 78M24 462 224 290M576 462 376 290" />
-        </svg>
+      <div className="scene-topline">
+        <span>01</span>
+        <span>MARKDOWN → MAIL</span>
       </div>
-      <motion.div
-        className="source-note"
-        initial={{ opacity: 0, x: -20, rotate: -9 }}
-        animate={{ opacity: 1, x: 0, rotate: -7 }}
-        transition={{ delay: 0.45, duration: 0.8 }}
-        style={{ y: reduced ? 0 : y }}
-        aria-hidden="true"
-      >
-        <div className="source-note-label">
-          <span /> Dein Markdown
-        </div>
-        <code>
-          **Hey Alex,**
-          <br />
-          <br />
-          gute Nachrichten.
-          <br />
-          Das Design ist *fertig*.
-        </code>
-        <ArrowUpRight size={22} className="source-note-arrow" />
-      </motion.div>
-      <motion.div
+      <div className="scene-glyph" aria-hidden="true">
+        **
+      </div>
+      <div
         className="hero-window"
-        initial={{ opacity: 0, y: reduced ? 0 : 38, rotate: reduced ? 0 : 3 }}
-        animate={{ opacity: 1, y: 0, rotate: 0 }}
-        transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        style={{ "--demo-font": demoFonts[font] } as CSSProperties}
       >
         <div className="window-titlebar">
           <div className="traffic-lights" aria-hidden="true">
@@ -74,7 +64,7 @@ export function HeroDemo() {
             <i />
           </div>
           <span>Eine kleine Nachricht</span>
-          <span className="window-title-icon">
+          <span className="window-title-icon" aria-hidden="true">
             <Send size={15} />
           </span>
         </div>
@@ -82,7 +72,7 @@ export function HeroDemo() {
           <div>
             <span>An:</span>
             <span className="recipient">
-              Alex <ChevronDown size={10} />
+              Alex <ChevronDown size={10} aria-hidden="true" />
             </span>
           </div>
           <div>
@@ -90,31 +80,44 @@ export function HeroDemo() {
             <b>Gute Nachrichten ✨</b>
           </div>
         </div>
-        <div className="mail-formatbar" aria-hidden="true">
-          <span>Georgia</span>
-          <ChevronDown size={12} />
-          <i />
-          <span>16</span>
-          <i />
-          <strong>B</strong>
-          <em>I</em>
-          <u>U</u>
-          <span className="formatbar-color" />
+        <div className="mail-formatbar">
+          <div
+            className="demo-fonts"
+            role="group"
+            aria-label="Schrift der formatierten Beispielnachricht"
+          >
+            {fontNames.map((name) => (
+              <button
+                key={name}
+                type="button"
+                className="demo-font"
+                aria-pressed={font === name}
+                aria-controls="hero-mail-preview"
+                onClick={() => selectFont(name)}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+          <i aria-hidden="true" />
+          <span aria-hidden="true">16</span>
+          <i aria-hidden="true" />
+          <strong aria-hidden="true">B</strong>
+          <em aria-hidden="true">I</em>
+          <u aria-hidden="true">U</u>
+          <span className="formatbar-color" aria-hidden="true" />
         </div>
-        <div className="hero-mail-content">
+        <div className="hero-mail-content" id="hero-mail-preview">
           <AnimatePresence mode="wait" initial={false}>
             {formatted ? (
               <motion.div
                 key="formatted"
-                initial={{
-                  opacity: 0,
-                  filter: reduced ? "none" : "blur(5px)",
-                  y: reduced ? 0 : 5,
-                }}
-                animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: reduced ? 0 : 0.4 }}
+                initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: reduced ? 1 : 0 }}
+                transition={{ duration: reduced ? 0 : 0.26 }}
                 className="mail-formatted"
+                style={{ fontFamily: "var(--demo-font)" }}
               >
                 <p>
                   <strong>Hey Alex,</strong>
@@ -138,55 +141,51 @@ export function HeroDemo() {
             ) : (
               <motion.div
                 key="markdown"
-                initial={{ opacity: 0 }}
+                initial={{ opacity: reduced ? 1 : 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, y: reduced ? 0 : -4 }}
-                transition={{ duration: 0.22 }}
+                exit={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : -4 }}
+                transition={{ duration: reduced ? 0 : 0.2 }}
                 className="mail-raw"
+                style={{ fontFamily: "var(--font-mono), monospace" }}
               >
-                {
-                  "**Hey Alex,**\n\ngute Nachrichten.\nDas Design ist *fertig*.\n\n- Ein klarer Plan.\n- Ein schönes Ergebnis.\n- Und ein bisschen weniger Arbeit.\n\nLiebe Grüße\nSam"
-                }
+                {rawMarkdown}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
         <div className="window-footer">
-          <span className={formatted ? "demo-status complete" : "demo-status"}>
-            <span />
+          <span
+            className={formatted ? "demo-status complete" : "demo-status"}
+            role="status"
+          >
+            <span aria-hidden="true" />
             {formatted
               ? "Dein Stil. Jetzt mit Format."
               : "Markdown wartet auf sein ⌘V."}
           </span>
         </div>
-      </motion.div>
-      <motion.div
-        className="paste-control"
-        style={{ x: "-50%" }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.7 }}
-      >
+      </div>
+      <div className="paste-control">
         <button
+          type="button"
           className={`paste-key ${formatted ? "is-pressed" : ""}`}
           onClick={toggleDemo}
-          aria-label={
-            formatted ? "Einfüge-Demo zurücksetzen" : "Einfüge-Demo abspielen"
-          }
+          aria-label="Formatierung der Mail-Demo umschalten"
+          aria-pressed={formatted}
+          aria-controls="hero-mail-preview"
         >
-          <span>⌘</span>
-          <span>V</span>
+          <span aria-hidden="true">⌘</span>
+          <span aria-hidden="true">V</span>
         </button>
         <div>
-          <span className="paste-control-label">Ein vertrauter Handgriff.</span>
-          <span className="paste-control-hint">Klick auf die Taste.</span>
+          <span className="paste-control-label">Einfügen. Auf deine Art.</span>
+          <span className="paste-control-hint">
+            Klicken &amp; Format wechseln
+          </span>
         </div>
-        <span className="paste-check" aria-hidden="true">
-          {formatted ? <Check size={18} /> : <ArrowUpRight size={18} />}
-        </span>
-      </motion.div>
+      </div>
       <div className="scene-caption">
-        Eine Demo. Keine Verbindung zu deinem Mail.
+        Browser-Demo. Ohne Verbindung zu deiner Mail-App.
       </div>
     </div>
   );

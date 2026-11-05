@@ -3,16 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowDown,
-  ArrowRight,
   ArrowUpRight,
   Check,
-  CheckCheck,
   Code2,
   Command,
-  GitBranch,
   Heart,
   LockKeyhole,
-  Minus,
   Monitor,
   Plus,
 } from "lucide-react";
@@ -76,115 +72,105 @@ export default async function Home() {
       <div className="site-shell">
         <SiteNav downloadAvailable={downloadAvailable} />
         <main id="inhalt">
-          <section className="hero section-wrap">
-            <div className="hero-copy">
-              <div className="eyebrow hero-eyebrow">
-                <span className="tiny-dot" /> Markdown für Apple Mail
+          <div className="hero-band">
+            <section className="hero section-wrap" aria-labelledby="hero-title">
+              <div className="hero-copy">
+                <div className="eyebrow hero-eyebrow">
+                  <span className="tiny-dot" /> FÜR APPLE MAIL GEMACHT
+                </div>
+                <h1 id="hero-title">
+                  Dein Text.
+                  <br />
+                  <span>Hat Format.</span>
+                </h1>
+                <p className="hero-description">
+                  Markdown rein. Schöne Mail raus. Ein ⌘V übernimmt die
+                  Formatierung – in der Schrift, Größe und Farbe deines
+                  Entwurfs.
+                </p>
+                <div className="hero-actions">
+                  <DownloadButton
+                    className="button button-primary"
+                    available={downloadAvailable}
+                  />
+                  <a className="button button-text" href="#spielplatz">
+                    Probier’s aus <ArrowDown size={17} />
+                  </a>
+                </div>
+                <div className="hero-facts">
+                  <span>
+                    <Monitor size={14} /> macOS 13+
+                  </span>
+                  <span>Kostenlos. Ohne Limit.</span>
+                </div>
               </div>
-              <h1>
-                Deine Worte.
-                <br />
-                <span>Dein Stil.</span>
-              </h1>
-              <p className="hero-description">
-                Aus Markdown wird eine richtig gute Mail. Mit einem{" "}
-                <kbd>⌘V</kbd> – und genau der Schrift, Größe und Farbe deines
-                Entwurfs.
-              </p>
-              <div className="hero-actions">
-                <DownloadButton
-                  className="button button-primary"
-                  available={downloadAvailable}
-                />
-                <a className="button button-text" href="#spielplatz">
-                  Selbst ausprobieren <ArrowDown size={17} />
+              <HeroDemo />
+              <div className="hero-footnote">
+                <span>EIN KLEINES TOOL. EIN GUTER HANDGRIFF.</span>
+                <a href="#so-gehts">
+                  Runterscrollen <ArrowDown size={14} />
                 </a>
               </div>
-              <div className="hero-facts">
-                <span>
-                  <Monitor size={14} /> macOS 13+
-                </span>
-                <span>
-                  <Check size={14} /> Unbegrenzt kostenlos
-                </span>
-                <span>
-                  <Code2 size={14} /> Open Source
-                </span>
-              </div>
-            </div>
-            <HeroDemo />
-          </section>
-
-          <div className="intro-strip section-wrap">
-            <span>
-              Weniger Klicks.
-              <br /> <strong>Mehr von dem, was du sagen willst.</strong>
-            </span>
-            <div className="strip-markdown" aria-hidden="true">
-              <span>**</span>Gute Gedanken<span>**</span>
-              <ArrowRight size={24} />
-              <b>Gute Gedanken</b>
-            </div>
+            </section>
           </div>
 
-          <section className="how-section section-wrap" id="so-gehts">
-            <Reveal className="section-heading">
-              <div className="eyebrow">01 / EIN HANDGRIFF GENÜGT</div>
+          <section className="workflow-section section-wrap" id="so-gehts">
+            <Reveal className="workflow-heading">
+              <div className="eyebrow">01 — WENIGER HANDARBEIT</div>
               <h2>
-                Dein Workflow.
+                Für Gedanken.
                 <br />
-                <span>Ein bisschen flüssiger.</span>
+                Nicht fürs Formatieren.
               </h2>
               <p>
-                Keine neue Schreib-App. Kein Fenster dazwischen.
+                Dein Editor kann Markdown. Mail kann deinen Stil.
                 <br />
-                Nur ein kleines Upgrade für das Mail, das du schon nutzt.
+                Wir bringen die beiden zusammen.
               </p>
             </Reveal>
-            <div className="steps">
-              <Reveal className="step" delay={0.05}>
-                <div className="step-art step-art-write" aria-hidden="true">
-                  <span className="writing-line">
-                    Eine <b>**gute**</b> Idee
-                    <span className="typing-caret" />
-                  </span>
-                  <span className="writing-under">
-                    beginnt mit deinen Worten.
-                  </span>
+            <div className="workflow-rows">
+              <Reveal className="workflow-row">
+                <span className="workflow-number">01</span>
+                <div>
+                  <h3>Schreib, wo du willst.</h3>
+                  <p>
+                    Im Editor, in deinen Notizen oder im KI-Chat. Kopiere deinen
+                    Markdown-Text.
+                  </p>
                 </div>
-                <span className="step-index">01</span>
-                <h3>Schreib in Markdown.</h3>
-                <p>
-                  Ein Text aus deinem Editor, einer Notiz oder deinem KI-Chat.
-                  Kopieren reicht.
-                </p>
+                <span className="workflow-sample raw-sample" aria-hidden="true">
+                  **Gute Idee.**
+                </span>
               </Reveal>
-              <Reveal className="step" delay={0.13}>
-                <div className="step-art step-art-paste" aria-hidden="true">
-                  <span className="mini-key">⌘</span>
-                  <span className="mini-key">V</span>
-                  <span className="key-pulse" />
+              <Reveal className="workflow-row">
+                <span className="workflow-number">02</span>
+                <div>
+                  <h3>Einfügen wie immer.</h3>
+                  <p>
+                    Cursor in den Nachrichtentext setzen. ⌘V drücken. Das war’s.
+                  </p>
                 </div>
-                <span className="step-index">02</span>
-                <h3>Füg ihn in Mail ein.</h3>
-                <p>
-                  Cursor in den Nachrichtentext setzen und wie gewohnt ⌘V
-                  drücken.
-                </p>
+                <span className="workflow-sample key-sample" aria-hidden="true">
+                  <kbd>⌘</kbd>
+                  <kbd>V</kbd>
+                </span>
               </Reveal>
-              <Reveal className="step" delay={0.21}>
-                <div className="step-art step-art-done" aria-hidden="true">
-                  <span>
-                    <CheckCheck size={21} /> Eine <b>gute</b> Idee
-                  </span>
-                  <small>Deine Schrift. Deine Farbe. Dein Stil.</small>
+              <Reveal className="workflow-row">
+                <span className="workflow-number">03</span>
+                <div>
+                  <h3>Sieht nach dir aus.</h3>
+                  <p>
+                    Fett, kursiv, Listen und Links. Mit dem bestehenden Textstil
+                    deines Entwurfs.
+                  </p>
                 </div>
-                <span className="step-index">03</span>
-                <h3>Sieht nach dir aus.</h3>
-                <p>
-                  Fett, kursiv und strukturiert – mit Schrift, Größe und Farbe
-                  deines Entwurfs.
-                </p>
+                <span
+                  className="workflow-sample finished-sample"
+                  aria-hidden="true"
+                >
+                  Gute Idee.
+                  <Check size={22} />
+                </span>
               </Reveal>
             </div>
           </section>
@@ -193,30 +179,35 @@ export default async function Home() {
             <div className="section-wrap">
               <Reveal className="play-heading">
                 <div>
-                  <div className="eyebrow">02 / EIN KLEINER SPIELPLATZ</div>
+                  <div className="eyebrow">02 — SELBST IST DER CURSOR</div>
                   <h2>
-                    Probier’s mit
+                    Mach’s zu
                     <br />
-                    <span>deinen Worten.</span>
+                    <span>deinem Text.</span>
                   </h2>
                 </div>
-                <p>
-                  Links Markdown schreiben.
-                  <br />
-                  Rechts die Wirkung sehen.
-                  <br />
-                  Und den Stil ruhig mal wechseln.
-                </p>
+                <div className="play-intro">
+                  <span className="play-doodle" aria-hidden="true">
+                    ↘
+                  </span>
+                  <p>
+                    Schreib links. Schau rechts.
+                    <br />
+                    Spiel mit Schrift und Farbe.
+                    <br />
+                    Das hier ist deine Spielwiese.
+                  </p>
+                </div>
               </Reveal>
               <Reveal>
                 <Playground />
               </Reveal>
               <div className="supported-formats">
-                <span>Ein Format für deine Gedanken.</span>
+                <span>VON KLEINEN AKZENTEN BIS ZUR KLAREN STRUKTUR.</span>
                 <div>
                   <b>Fett</b>
                   <i>Kursiv</i>
-                  <span className="format-list">≡ Listen</span>
+                  <span>≡ Listen</span>
                   <span className="format-link">Links ↗</span>
                   <span className="format-code">`Code`</span>
                   <span>❝ Zitate</span>
@@ -225,73 +216,57 @@ export default async function Home() {
             </div>
           </section>
 
-          <section className="quiet-section section-wrap">
-            <Reveal className="quiet-heading">
-              <div className="eyebrow">03 / KLEIN. UND GENAU RICHTIG.</div>
+          <section className="principles-section section-wrap">
+            <Reveal className="principles-head">
+              <div className="eyebrow">03 — PASST IN DEINEN ALLTAG</div>
               <h2>
-                Weniger App.
+                Kleine App.
                 <br />
-                <span>Mehr Ruhe im Kopf.</span>
+                Klare Sache.
               </h2>
             </Reveal>
-            <div className="quiet-grid">
-              <Reveal className="privacy-feature">
-                <div className="privacy-visual" aria-hidden="true">
-                  <div className="privacy-ring ring-outer" />
-                  <div className="privacy-ring ring-inner" />
-                  <div className="privacy-lock">
-                    <LockKeyhole size={33} strokeWidth={1.4} />
-                  </div>
-                  <span className="privacy-tag">
-                    <span /> Bleibt auf deinem Mac.
-                  </span>
-                  <span className="privacy-orbit-dot" />
-                </div>
-                <h3>Deine Worte bleiben bei dir.</h3>
+            <div className="principles-grid">
+              <Reveal className="local-principle">
+                <LockKeyhole size={26} strokeWidth={1.5} />
+                <h3>
+                  Deine Worte.
+                  <br />
+                  Dein Mac.
+                  <br />
+                  <span>Bleibt so.</span>
+                </h3>
                 <p>
-                  Die App formatiert lokal. Kein Konto, kein Upload und kein
-                  Konvertierungsserver.
+                  Die Formatierung passiert lokal auf deinem Mac. Ohne Konto,
+                  Upload oder Konvertierungsserver.
                 </p>
                 <Link href="/datenschutz" className="inline-link">
-                  Mehr zum Datenschutz <ArrowUpRight size={15} />
+                  Zum Datenschutz <ArrowUpRight size={17} />
                 </Link>
               </Reveal>
-              <div className="quiet-list">
-                <Reveal className="quiet-item">
-                  <span className="quiet-icon">
-                    <Command size={23} />
-                  </span>
-                  <div>
-                    <h3>Vertraut ab dem ersten Einfügen.</h3>
-                    <p>
-                      Ein Tastenkürzel, das du schon kennst. In einer App, die
-                      du schon nutzt.
-                    </p>
-                  </div>
+              <div className="principle-notes">
+                <Reveal>
+                  <Command size={25} />
+                  <h3>Du kennst dich schon aus.</h3>
+                  <p>
+                    Ein vertrautes Tastenkürzel. In Apple Mail. Die App bleibt
+                    in der Menüleiste, bis du sie brauchst.
+                  </p>
                 </Reveal>
-                <Reveal className="quiet-item" delay={0.08}>
-                  <span className="quiet-icon">
-                    <Minus size={23} />
-                  </span>
-                  <div>
-                    <h3>Unauffällig, bis du sie brauchst.</h3>
-                    <p>
-                      Mail Markdown lebt in der Menüleiste. Eine Vorschau und
-                      deine Einstellungen sind immer einen Klick entfernt.
-                    </p>
-                  </div>
+                <Reveal>
+                  <Heart size={25} />
+                  <h3>Einfach ein gutes Tool.</h3>
+                  <p>
+                    Kostenlos und unbegrenzt. Ohne Abo, Zähler oder
+                    Freischaltung.
+                  </p>
                 </Reveal>
-                <Reveal className="quiet-item" delay={0.16}>
-                  <span className="quiet-icon">
-                    <Heart size={23} />
-                  </span>
-                  <div>
-                    <h3>Einfach kostenlos.</h3>
-                    <p>
-                      Kein Abo. Kein Zähler. Keine Freischaltung. Nur ein
-                      nützliches kleines Tool.
-                    </p>
-                  </div>
+                <Reveal>
+                  <Code2 size={25} />
+                  <h3>Offen bis zur letzten Zeile.</h3>
+                  <p>
+                    Unter der MIT-Lizenz. Zum Benutzen, Verbessern und
+                    Weiterbauen.
+                  </p>
                 </Reveal>
               </div>
             </div>
@@ -300,16 +275,15 @@ export default async function Home() {
           <section className="source-section" id="open-source">
             <div className="source-inner section-wrap">
               <Reveal>
-                <div className="eyebrow">OFFENER CODE. GUTE ABSICHTEN.</div>
+                <div className="eyebrow">AUS WIEN. FÜR DEINEN WORKFLOW.</div>
                 <h2>
-                  Kleine App.
+                  Gute Tools
                   <br />
-                  <span>Offen für große Ideen.</span>
+                  sind zum Teilen da.
                 </h2>
                 <p>
-                  Mail Markdown ist ein kostenloses Projekt von E1NSER. Der
-                  Quellcode ist offen. Schau rein, melde einen Fehler oder bau
-                  etwas Eigenes daraus.
+                  Ein kostenloses Projekt von E1NSER. Schau in den Code, melde
+                  einen Fehler oder mach deine eigene Idee daraus.
                 </p>
                 <a
                   href={repo}
@@ -317,41 +291,17 @@ export default async function Home() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <Code2 size={19} /> Auf GitHub ansehen{" "}
-                  <ArrowUpRight size={17} />
+                  Zum GitHub-Repo <ArrowUpRight size={18} />
                 </a>
               </Reveal>
-              <Reveal className="source-art" delay={0.1}>
-                <div className="source-code-card">
-                  <div className="source-code-top">
-                    <GitBranch size={15} />
-                    <span>main</span>
-                    <span className="source-code-public">public</span>
-                  </div>
-                  <code>
-                    <span className="code-comment">
-                      // Eine kleine Idee für bessere Mails.
-                    </span>
-                    <br />
-                    <br />
-                    <span className="code-blue">let</span> price ={" "}
-                    <span className="code-green">0</span>
-                    <br />
-                    <span className="code-blue">let</span> limits ={" "}
-                    <span className="code-green">nil</span>
-                    <br />
-                    <span className="code-blue">let</span> processing ={" "}
-                    <span className="code-orange">"on your Mac"</span>
-                    <br />
-                    <span className="code-blue">let</span> license ={" "}
-                    <span className="code-orange">"MIT"</span>
-                  </code>
-                  <div className="source-code-bottom">
-                    <span>
-                      <span /> Swift + AppKit
-                    </span>
-                    <span>Mit Liebe aus Wien. ↗</span>
-                  </div>
+              <Reveal className="source-signature">
+                <span className="source-mark" aria-hidden="true">
+                  M↓
+                </span>
+                <span>Mail Markdown</span>
+                <div>
+                  <span>SWIFT + APPKIT</span>
+                  <span>MIT LICENSE ↗</span>
                 </div>
               </Reveal>
             </div>
@@ -359,8 +309,8 @@ export default async function Home() {
 
           <section className="faq-section section-wrap">
             <Reveal className="faq-heading">
-              <div className="eyebrow">NOCH EINE KLEINE FRAGE?</div>
-              <h2>Gut zu wissen.</h2>
+              <div className="eyebrow">04 — GUT ZU WISSEN</div>
+              <h2>Die Details.</h2>
               <p>Die Details, bevor du loslegst.</p>
             </Reveal>
             <div className="faq-list">
@@ -384,11 +334,11 @@ export default async function Home() {
                 width={94}
                 height={94}
               />
-              <div className="eyebrow">DEIN NÄCHSTES ⌘V KANN MEHR.</div>
+              <div className="eyebrow">BEREIT FÜR DEIN NÄCHSTES ⌘V?</div>
               <h2>
-                Weniger formatieren.
+                Gute Worte verdienen
                 <br />
-                <span>Mehr du.</span>
+                <span>gutes Format.</span>
               </h2>
               <p>Kostenlos. Unbegrenzt. Für deinen Mac.</p>
               <DownloadButton

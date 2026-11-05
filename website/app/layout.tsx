@@ -18,7 +18,7 @@ const mono = DM_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://mail-markdown.vercel.app"),
   title: {
-    default: "Mail Markdown — Deine Worte. Dein Stil.",
+    default: "Mail Markdown — Dein Text. Hat Format.",
     template: "%s · Mail Markdown",
   },
   description:
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   applicationName: "Mail Markdown",
   authors: [{ name: "E1NSER.", url: "https://einser.at" }],
   openGraph: {
-    title: "Deine Worte. Dein Stil.",
+    title: "Dein Text. Hat Format.",
     description: "Markdown für Apple Mail. Kostenlos, lokal und Open Source.",
     locale: "de_AT",
     type: "website",
@@ -39,7 +39,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="de" className={`${manrope.variable} ${mono.variable}`}>
+    <html
+      lang="de"
+      data-scroll-behavior="smooth"
+      className={`${manrope.variable} ${mono.variable}`}
+    >
       <body>{children}</body>
     </html>
   );
