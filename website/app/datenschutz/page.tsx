@@ -118,6 +118,11 @@ export default function DatenschutzPage() {
       <section>
         <h2>Externe Links und Support</h2>
         <p>
+          Für den Download-Status ruft unser Server öffentliche Release-Daten
+          von GitHub ab. Deine Eingaben im Playground werden dabei nicht
+          übertragen. Der eigentliche App-Download erfolgt direkt bei GitHub.
+        </p>
+        <p>
           Quellcode, Downloads und Fehlerberichte liegen bei GitHub. Erst wenn
           du einem solchen Link folgst, rufst du GitHub auf; dort gelten die{" "}
           <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">

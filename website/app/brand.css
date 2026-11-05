@@ -501,6 +501,9 @@
 .site-footer {
   padding-bottom: 25px;
 }
+.start-note {
+  overflow-wrap: anywhere;
+}
 .legal-page {
   color: var(--muted);
 }

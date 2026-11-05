@@ -3,8 +3,10 @@
 import Image from "next/image";
 import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { DownloadButton } from "./download-button";
+import { LATEST_DOWNLOAD_URL } from "@/lib/release-model";
 
-export function SiteNav() {
+export function SiteNav({ downloadAvailable }: { downloadAvailable: boolean }) {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
   useEffect(() => {
@@ -45,9 +47,7 @@ export function SiteNav() {
         >
           {dark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        <a className="nav-cta" href="#starten">
-          Kostenlos starten <ArrowUpRight size={15} />
-        </a>
+        <DownloadButton className="nav-cta" available={downloadAvailable} />
         <button
           className="icon-button mobile-menu-button"
           onClick={() => setOpen(!open)}
@@ -73,8 +73,12 @@ export function SiteNav() {
           <a onClick={() => setOpen(false)} href="#open-source">
             Open Source <ArrowUpRight size={18} />
           </a>
-          <a onClick={() => setOpen(false)} href="#starten">
-            Kostenlos starten <ArrowUpRight size={18} />
+          <a
+            onClick={() => setOpen(false)}
+            href={downloadAvailable ? LATEST_DOWNLOAD_URL : "#starten"}
+          >
+            {downloadAvailable ? "Für macOS laden" : "Download-Status"}{" "}
+            <ArrowUpRight size={18} />
           </a>
         </nav>
       )}

@@ -4,7 +4,7 @@ German landing page for [Mail Markdown](https://github.com/E1NSER/mail-markdown)
 
 Production: [mail-markdown.vercel.app](https://mail-markdown.vercel.app).
 
-The primary action links to the source-build instructions. A public notarized app download is still being prepared; keep this distinction when changing the copy. The app has no subscriptions or usage quotas.
+The primary action automatically offers the latest public stable Mac release when its approved DMG is available. Until then the page shows the release status and source-build instructions. The app has no subscriptions or usage quotas.
 
 ## Local development
 
@@ -21,6 +21,7 @@ Before submitting changes:
 
 ```sh
 npm run typecheck
+npm test
 npm run build
 ```
 
@@ -50,6 +51,14 @@ For a manual CLI deployment, run the command from the **repository root**, becau
 # From the repository root, not website/:
 vercel --prod
 ```
+
+## Latest release download
+
+The homepage checks GitHub's public `/releases/latest` metadata and revalidates every five minutes, without a website deployment. A ready release must contain the uploaded, nonempty `Mail-Markdown-universal-notarized.dmg` asset with a download URL belonging to this repository. Drafts, prereleases, source ZIPs and local development builds are not offered.
+
+The download points directly to [GitHub's Latest asset URL](https://github.com/E1NSER/mail-markdown/releases/latest/download/Mail-Markdown-universal-notarized.dmg), so GitHub selects the current release at click time. It never pins the installer link to the page's cached version label and makes no per-click REST request. Availability and version labels may update a few minutes after publication.
+
+No release, a release missing its DMG, and a temporarily unavailable GitHub API have distinct fallback text. A failed lookup never invents an installer or falls back to an older release. See [the release guide](../docs/RELEASE.md) for building, validating and publishing the fixed asset. Metadata and filenames alone do not verify signing or notarization; those checks belong to the release process.
 
 ## Reference notes
 

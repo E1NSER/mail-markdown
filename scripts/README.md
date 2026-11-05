@@ -25,11 +25,19 @@ export NOTARY_PROFILE='Name-des-eingerichteten-Profils'
 zsh scripts/build-app.sh --staging-output "$PWD/dist/public/Mail Markdown.app"
 
 # Dieser Befehl überträgt App und DMG ausdrücklich zur Prüfung an Apple:
-zsh scripts/notarize-dmg.sh --app "$PWD/dist/public/Mail Markdown.app"
+zsh scripts/notarize-dmg.sh \
+  --app "$PWD/dist/public/Mail Markdown.app" \
+  --output "$PWD/dist/Mail-Markdown-universal-notarized.dmg"
 ```
 
 Developer-ID-Builds aktivieren Hardened Runtime und einen sicheren Zeitstempel. Der Notarisierungsablauf akzeptiert ausschließlich die ausdrücklich gewählte Developer-ID-Signatur, wartet auf Apples Ergebnis, heftet Tickets an App und DMG an und prüft die Tickets anschließend. Er führt keine Registrierung, Zertifikatsausstellung oder Änderung am Apple-Konto durch.
 
 Solange die Developer-ID-Identität oder das Schlüsselbundprofil fehlen, kann dieser öffentliche Release-Schritt nicht abgeschlossen werden. Ein erfolgreicher lokaler Build oder eine Apple-Development-Signatur ist kein Nachweis einer erfolgreichen Notarisierung.
+
+Für jeden stabilen GitHub-Release bleibt der öffentliche Dateiname **`Mail-Markdown-universal-notarized.dmg`** gleich. Nur das eigene geprüfte Universal-DMG mit Developer-ID-Signatur und erfolgreicher Notarisierung unter diesem Namen hochladen. Die Tag-Version muss `CFBundleShortVersionString` in Quell-Plist und gebauter App entsprechen.
+
+Zuerst mit `gh release create --draft` einen Entwurf samt fertigem DMG anlegen, den Upload auf `state: uploaded` und eine Größe größer null prüfen und Release Notes sowie Artefakt kontrollieren. Erst danach mit `gh release edit --draft=false --prerelease=false --latest` veröffentlichen. Die vollständigen Befehle mit exaktem Repository, Versionsübernahme, `--verify-tag` und Prüfungen stehen in [der Release-Anleitung](../docs/RELEASE.md#als-github-release-bereitstellen). Diese Reihenfolge verhindert einen **Latest**-Release ohne Download-Datei.
+
+Der Website-Download zeigt auf [GitHubs festes Latest-Asset](https://github.com/E1NSER/mail-markdown/releases/latest/download/Mail-Markdown-universal-notarized.dmg). GitHub bestimmt beim Abruf den aktuellen stabilen Release; die Website muss dafür nicht neu veröffentlicht werden. Ihre Verfügbarkeits- und Versionsanzeige kann bis zu fünf Minuten verzögert sein. Ohne passenden öffentlichen Release zeigt sie einen ehrlichen Verfügbarkeitshinweis.
 
 Apple beschreibt den Ablauf unter [Notarizing macOS software before distribution](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution) und [Customizing the notarization workflow](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).

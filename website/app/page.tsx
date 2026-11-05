@@ -20,44 +20,61 @@ import { SiteNav } from "@/components/site-nav";
 import { HeroDemo } from "@/components/hero-demo";
 import { Playground } from "@/components/playground";
 import { MotionProvider, Reveal } from "@/components/motion";
+import { DownloadButton } from "@/components/download-button";
+import { getLatestRelease } from "@/lib/github-release";
+import { RELEASES_URL, type ReleaseState } from "@/lib/release-model";
 
 const repo = "https://github.com/E1NSER/mail-markdown";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
-const faqs = [
-  [
-    "Ist Mail Markdown wirklich kostenlos?",
-    "Ja. Die App ist kostenlos und unbegrenzt nutzbar. Es gibt kein Abo, kein Konto und kein Limit für deine Markdown-Texte. Der Quellcode steht unter der MIT-Lizenz auf GitHub.",
-  ],
-  [
-    "Wie bekomme ich die App?",
-    "Aktuell kannst du Mail Markdown aus dem öffentlichen Quellcode selbst bauen. Die Anleitung findest du auf GitHub. Ein fertig signierter und notarisierter Download wird noch vorbereitet.",
-  ],
-  [
-    "Was bleibt von meinem Mail-Stil erhalten?",
-    "Die App übernimmt Schriftart, Schriftgröße und Textfarbe aus einem benachbarten Zeichen im Entwurf. Markdown ergänzt dazu zum Beispiel Fett- und Kursivschrift, Listen und Links. Überschriften behalten die Schriftgröße; Code erscheint in einer gleich großen Monospace-Schrift.",
-  ],
-  [
-    "Was passiert mit meinen Nachrichten?",
-    "Die App verarbeitet den Text lokal auf deinem Mac. Es gibt keinen Konvertierungsserver und keine Analysefunktionen. Für die Stilübernahme benötigt sie deine Bedienungshilfen-Freigabe. Die Originalzwischenablage bleibt vorübergehend im Arbeitsspeicher wiederherstellbar.",
-  ],
-  [
-    "Funktioniert es in jedem Entwurf?",
-    "Du brauchst einen Rich-Text-Entwurf in Apple Mail und vorhandenen Text als Stilprobe. In einem ganz leeren Entwurf oder wenn die Schrift nicht gelesen werden kann, wird normal eingefügt. Die automatische Umwandlung nutzt die normale Tastenkombination ⌘V; Menü-Einfügen wird nicht abgefangen.",
-  ],
-  [
-    "Gibt es die App im Mac App Store?",
-    "Derzeit nicht. Mail Markdown ist eine eigenständige Begleit-App für Apple Mail. Der aktuelle Zugriff über Bedienungshilfen erfordert eine direkte Verteilung. Eine App-Store-Version würde einen anderen Bedienablauf benötigen.",
-  ],
-];
+export const revalidate = 300;
 
-export default function Home() {
+function downloadAnswer(release: ReleaseState): string {
+  if (release.status === "available")
+    return "Über „Für macOS laden“ erhältst du direkt das Universal-DMG des neuesten stabilen GitHub-Releases. Öffne das DMG und ziehe Mail Markdown in den Programme-Ordner. Aktiviere anschließend die Bedienungshilfen-Freigabe für die App.";
+  if (release.status === "not-published")
+    return "Der erste öffentliche Mac-Release wird noch vorbereitet. Sobald er verfügbar ist, erscheint hier automatisch der direkte Download. Bis dahin kannst du Mail Markdown mit der Anleitung auf GitHub selbst bauen.";
+  if (release.status === "no-download")
+    return "Zum neuesten GitHub-Release ist noch kein Universal-DMG verfügbar. Du kannst den Release-Status auf GitHub prüfen oder die App aus dem Quellcode bauen.";
+  return "Der Download-Status ist gerade nicht abrufbar. Prüfe die Releases auf GitHub oder nutze dort die Anleitung zum Selbstbauen.";
+}
+
+function getFaqs(release: ReleaseState) {
+  return [
+    [
+      "Ist Mail Markdown wirklich kostenlos?",
+      "Ja. Die App ist kostenlos und unbegrenzt nutzbar. Es gibt kein Abo, kein Konto und kein Limit für deine Markdown-Texte. Der Quellcode steht unter der MIT-Lizenz auf GitHub.",
+    ],
+    ["Wie bekomme ich die App?", downloadAnswer(release)],
+    [
+      "Was bleibt von meinem Mail-Stil erhalten?",
+      "Die App übernimmt Schriftart, Schriftgröße und Textfarbe aus einem benachbarten Zeichen im Entwurf. Markdown ergänzt dazu zum Beispiel Fett- und Kursivschrift, Listen und Links. Überschriften behalten die Schriftgröße; Code erscheint in einer gleich großen Monospace-Schrift.",
+    ],
+    [
+      "Was passiert mit meinen Nachrichten?",
+      "Die App verarbeitet den Text lokal auf deinem Mac. Es gibt keinen Konvertierungsserver und keine Analysefunktionen. Für die Stilübernahme benötigt sie deine Bedienungshilfen-Freigabe. Die Originalzwischenablage bleibt vorübergehend im Arbeitsspeicher wiederherstellbar.",
+    ],
+    [
+      "Funktioniert es in jedem Entwurf?",
+      "Du brauchst einen Rich-Text-Entwurf in Apple Mail und vorhandenen Text als Stilprobe. In einem ganz leeren Entwurf oder wenn die Schrift nicht gelesen werden kann, wird normal eingefügt. Die automatische Umwandlung nutzt die normale Tastenkombination ⌘V; Menü-Einfügen wird nicht abgefangen.",
+    ],
+    [
+      "Gibt es die App im Mac App Store?",
+      "Derzeit nicht. Mail Markdown ist eine eigenständige Begleit-App für Apple Mail. Der aktuelle Zugriff über Bedienungshilfen erfordert eine direkte Verteilung. Eine App-Store-Version würde einen anderen Bedienablauf benötigen.",
+    ],
+  ];
+}
+
+export default async function Home() {
+  const release = await getLatestRelease();
+  const downloadAvailable = release.status === "available";
+  const faqs = getFaqs(release);
   return (
     <MotionProvider>
       <a className="skip-link" href="#inhalt">
         Zum Inhalt
       </a>
       <div className="site-shell">
-        <SiteNav />
+        <SiteNav downloadAvailable={downloadAvailable} />
         <main id="inhalt">
           <section className="hero section-wrap">
             <div className="hero-copy">
@@ -75,9 +92,10 @@ export default function Home() {
                 Entwurfs.
               </p>
               <div className="hero-actions">
-                <a className="button button-primary" href="#starten">
-                  Kostenlos starten <ArrowUpRight size={18} />
-                </a>
+                <DownloadButton
+                  className="button button-primary"
+                  available={downloadAvailable}
+                />
                 <a className="button button-text" href="#spielplatz">
                   Selbst ausprobieren <ArrowDown size={17} />
                 </a>
@@ -373,18 +391,41 @@ export default function Home() {
                 <span>Mehr du.</span>
               </h2>
               <p>Kostenlos. Unbegrenzt. Für deinen Mac.</p>
-              <a
+              <DownloadButton
                 className="button button-primary"
-                href={`${repo}#build-locally`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Aus dem Quellcode starten <ArrowUpRight size={18} />
-              </a>
+                available={downloadAvailable}
+                sourceFallback
+              />
               <span className="start-note">
-                Ein signierter und notarisierter Download wird vorbereitet.
-                <br />
-                Bis dahin findest du die Build-Anleitung auf GitHub.
+                {release.status === "available" ? (
+                  <>
+                    {release.version} · Universal-DMG · kostenlos
+                    <br />
+                    <a href={`${RELEASES_URL}/latest`}>
+                      Release-Notes ansehen ↗
+                    </a>
+                  </>
+                ) : release.status === "not-published" ? (
+                  <>
+                    Der erste öffentliche Mac-Release wird vorbereitet.
+                    <br />
+                    Bis dahin kannst du die App selbst bauen.
+                  </>
+                ) : release.status === "no-download" ? (
+                  <>
+                    Für {release.version} ist noch kein Mac-Download verfügbar.
+                    <br />
+                    <a href={RELEASES_URL}>
+                      Release-Status auf GitHub ansehen ↗
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    Der Download-Status ist gerade nicht abrufbar.
+                    <br />
+                    <a href={RELEASES_URL}>Releases auf GitHub prüfen ↗</a>
+                  </>
+                )}
               </span>
             </Reveal>
             <span className="start-watermark" aria-hidden="true">
