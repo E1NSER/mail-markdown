@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Mail Markdown — companion icon</title>
+  <desc>Original blue envelope and white Markdown letter on a cool macOS tile. All elements are editable vector paths.</desc>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#F4F9FF"/><stop offset="1" stop-color="#DCEBFF"/></linearGradient>
+    <linearGradient id="back" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#49A7F5"/><stop offset="1" stop-color="#1B7ADA"/></linearGradient>
+    <linearGradient id="paper" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#F0F7FF"/></linearGradient>
+    <linearGradient id="left" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#79C5FF"/><stop offset="1" stop-color="#3197F0"/></linearGradient>
+    <linearGradient id="right" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#63B6F8"/><stop offset="1" stop-color="#268AE6"/></linearGradient>
+    <linearGradient id="front" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#379FF3"/><stop offset="1" stop-color="#1375DB"/></linearGradient>
+    <filter id="tileShadow" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="-12" stdDeviation="13" flood-color="#244A79" flood-opacity=".18"/></filter>
+    <filter id="envelopeShadow" x="-20%" y="-25%" width="140%" height="160%"><feDropShadow dx="0" dy="-18" stdDeviation="14" flood-color="#235A9B" flood-opacity=".24"/></filter>
+    <filter id="paperShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="-7" stdDeviation="8" flood-color="#245A91" flood-opacity=".14"/></filter>
+  </defs>
+  <g transform="translate(0 1024) scale(1 -1)">
+    <rect id="macOS-tile" x="88" y="88" width="848" height="848" rx="188" fill="url(#tile)" stroke="#AFCBEA" stroke-opacity=".7" stroke-width="2" filter="url(#tileShadow)"/>
+    <rect id="envelope-back" x="226" y="286" width="572" height="360" rx="58" fill="url(#back)" filter="url(#envelopeShadow)"/>
+    <rect id="letter" x="334" y="460" width="356" height="350" rx="30" fill="url(#paper)" stroke="#B8D4F0" stroke-width="2" filter="url(#paperShadow)"/>
+    <g id="markdown-mark" fill="none" stroke="#4D7BB3" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M420 696V760L452 724L484 760V696"/>
+      <path d="M578 760V699M556 721L578 699L600 721"/>
+    </g>
+    <path id="letter-line" d="M404 672H620" fill="none" stroke="#C8DCF1" stroke-width="9" stroke-linecap="round"/>
+    <path id="left-fold" d="M226 610L512 414L226 344Z" fill="url(#left)"/>
+    <path id="right-fold" d="M798 610L512 414L798 344Z" fill="url(#right)"/>
+    <path id="envelope-front" d="M226 344L468 486C496 506 528 506 556 486L798 344C798 312 772 286 740 286H284C252 286 226 312 226 344Z" fill="url(#front)"/>
+    <path id="left-crease" d="M242 610L474 451" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-opacity=".38" stroke-linecap="round"/>
+    <path id="right-crease" d="M782 610L550 451" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-opacity=".28" stroke-linecap="round"/>
+  </g>
+</svg>

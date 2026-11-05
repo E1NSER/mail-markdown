@@ -19,6 +19,13 @@ dist/
 *.ips
 xcuserdata/
 *.xcuserstate
+node_modules/
+.next/
+.vercel/
+*.tsbuildinfo
+/website/out/
 
 # Private design comparisons can include third-party reference artwork.
 /design/*.png
+.vercel
+.env*.local

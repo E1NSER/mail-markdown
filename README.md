@@ -1,5 +1,7 @@
 # Mail Markdown
 
+[Website](https://mail-markdown.vercel.app) · [Build from source](#build-locally) · [Contributing](CONTRIBUTING.md)
+
 **Free, unlimited Markdown formatting for Apple Mail.** Paste with **⌘V** and keep the font, size and color of your existing draft.
 
 Mail Markdown is an independent native macOS companion app by [E1NSER.](https://einser.at). It runs in the menu bar and includes settings, a live Markdown preview and help. There are no subscriptions, formatting quotas, accounts, analytics or remote servers.
