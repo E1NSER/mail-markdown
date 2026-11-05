@@ -1,0 +1,103 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+}
+
+.field {
+  position: absolute;
+  inset: -20%;
+  animation-play-state: paused;
+}
+
+/* Only darker tones are composited over icon blue, preserving white text contrast. */
+.first {
+  background: radial-gradient(ellipse at 66% 40%, #074b9e99, #074b9e44 28%, #074b9e00 65%);
+  opacity: 0.7;
+  transform: translate3d(-7%, 4%, 0) scale(1.04);
+  animation: ambient-first 20s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.second {
+  background: radial-gradient(ellipse at 30% 72%, #073f8b77, #073f8b00 62%);
+  opacity: 0.55;
+  transform: translate3d(7%, -4%, 0) scale(1.02);
+  animation: ambient-second 24s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.layer[data-running="true"] .field {
+  animation-play-state: running;
+}
+
+@keyframes ambient-first {
+  from {
+    opacity: 0.7;
+    transform: translate3d(-7%, 4%, 0) scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(9%, -5%, 0) scale(1.12);
+  }
+}
+
+@keyframes ambient-second {
+  from {
+    opacity: 0.55;
+    transform: translate3d(7%, -4%, 0) scale(1.02);
+  }
+  to {
+    opacity: 0.9;
+    transform: translate3d(-8%, 5%, 0) scale(1.08);
+  }
+}
+
+.controls {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-start;
+  padding-bottom: 12px;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  margin-left: -10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #fff;
+  background: transparent;
+  font: 500 11px/1.4 var(--font-sans), sans-serif;
+  cursor: pointer;
+}
+
+.toggle:hover:not(:disabled) {
+  background: #073f8b33;
+  border-color: #ffffff30;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.toggle:disabled {
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer .field {
+    animation: none !important;
+    transform: none !important;
+  }
+}

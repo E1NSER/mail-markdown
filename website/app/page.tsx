@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowDown, ArrowUpRight, Monitor, Plus } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { HeroDemo } from "@/components/hero-demo";
+import { HeroAmbient } from "@/components/hero-ambient";
 import { Playground } from "@/components/playground";
 import { MotionProvider, Reveal } from "@/components/motion";
 import { DownloadButton } from "@/components/download-button";
@@ -113,6 +114,7 @@ export default async function Home() {
               </div>
               <HeroDemo />
             </section>
+            <HeroAmbient />
           </div>
 
           <section className="play-section" id="spielplatz">
