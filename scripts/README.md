@@ -14,6 +14,22 @@ Ohne `--staging-output` ist das Ziel `dist/Mail Markdown.app`. Eine laufende Zie
 
 Ein Apple-Development-Build ist für die lokale Prüfung vorbereitet. Er ist keine öffentlich notarisiert veröffentlichte App. Das DMG-Erstellen startet weder die App noch Finder und überträgt keine App-Dateien an Apple. Ein Developer-ID-Build verwendet beim Signieren den erforderlichen Apple-Zeitstempeldienst.
 
+## App-Icon aus dem SVG erzeugen
+
+Der gemeinsame Master ist **`Resources/AppIcon-v2.svg`**. Er enthält die korrigierte Originalgrafik der Website. Änderungen an diesem SVG vornehmen und anschließend alle Ausgaben daraus erzeugen; die alten Swift-Generatoren sind gesperrte Legacy-Einstiegspunkte.
+
+Voraussetzungen sind macOS mit `iconutil`, **Node.js 24.x** und die installierten Website-Abhängigkeiten. `sharp` wird aus dem Website-Paket aufgelöst. Falls die Abhängigkeiten fehlen, sie mit dem vorhandenen Lockfile installieren:
+
+```sh
+node --version # 24.x
+npm --prefix website ci
+node scripts/generate-icon.mjs
+```
+
+Der Generator rendert transparente PNGs für alle zehn macOS-Iconset-Varianten, prüft die Größen sowie die vollständige Dekodierung und Transparenz nach einem ICNS-Roundtrip und aktualisiert `Resources/AppIcon.png` und `Resources/AppIcon.icns`. Vorhandene `AppIcon-v2.png`, `AppIcon-v2.icns` und `AppIcon.svg` werden ebenfalls synchronisiert, ebenso beide Website-Kopien `website/public/app-icon.svg` und `website/app/icon.svg`.
+
+Alle Dateien entstehen zuerst temporär. Erst nach den Prüfungen werden vollständige Dateien atomar ersetzt; bei einem Fehler während der Übernahme werden bereits ersetzte Ausgaben zurückgesetzt. Der Vorgang baut oder startet keine App und ändert keine macOS-Berechtigungen. Der anschließende App-Build übernimmt `Resources/AppIcon.icns`; für den öffentlichen Build einen eigenen `--staging-output` verwenden und die Assets vor dem Signieren erzeugen.
+
 ## Öffentliche Veröffentlichung vorbereiten
 
 Erforderlich sind eine gültige **Developer ID Application**-Signieridentität im Schlüsselbund und ein bereits eingerichtetes **notarytool-Schlüsselbundprofil**. Zugangsdaten werden nicht in Projektdateien gespeichert.
