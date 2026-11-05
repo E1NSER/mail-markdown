@@ -5,10 +5,9 @@ import {
   motion,
   useAnimationControls,
   useInView,
-  useReducedMotion,
 } from "motion/react";
 import { RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./app-icon-scene.module.css";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -20,7 +19,7 @@ export function AppIconScene() {
   const hasPlayed = useRef(false);
   const playback = useRef(0);
   const inView = useInView(stage, { once: true, amount: 0.55 });
-  const reduced = useReducedMotion();
+  const [reduced, setReduced] = useState<boolean | null>(null);
   const icon = useAnimationControls();
   const incoming = useAnimationControls();
   const outgoing = useAnimationControls();
@@ -99,15 +98,24 @@ export function AppIconScene() {
   }, [icon, incoming, outgoing, reduced, showStatic, stop]);
 
   useEffect(() => {
+    // The installed Motion hook snapshots this preference at mount. Subscribe
+    // directly so changing it mid-sequence also cancels the actual controls.
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncPreference = () => {
+      if (preference.matches) showStatic();
+      setReduced(preference.matches);
+    };
+    syncPreference();
+    preference.addEventListener("change", syncPreference);
+    return () => preference.removeEventListener("change", syncPreference);
+  }, [showStatic]);
+
+  useEffect(() => {
     if (inView && !hasPlayed.current && reduced !== null) {
       hasPlayed.current = true;
       play();
     }
   }, [inView, play, reduced]);
-
-  useEffect(() => {
-    if (reduced) showStatic();
-  }, [reduced, showStatic]);
 
   useEffect(() => stop, [stop]);
 

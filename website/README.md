@@ -37,7 +37,7 @@ Manrope and DM Mono use `next/font`: font files are fetched at build time and se
 
 ## Motion and accessibility
 
-CSS handles small transitions; Motion handles the product demo and section reveals. Components use `useReducedMotion`, with a reduced-motion provider and CSS preference handling.
+CSS handles small transitions; Motion handles the product demo and section reveals. Product scenes subscribe directly to the reduced-motion media query so changing the preference also interrupts an active sequence. The shared motion provider, section reveals and CSS respect the same preference.
 
 The hero stages a single conversion when it enters view: key press, Markdown exit, formatted lines, then completion feedback. Replay and font controls interrupt pending steps immediately. Fine mouse pointers add restrained spring depth; touch, keyboard focus and reduced motion keep the window still. The icon scene uses a separate one-shot sequence to move a Markdown sheet behind the icon and bring the formatted mail forward. Neither scene runs an idle loop.
 

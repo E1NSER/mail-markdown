@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { motion, useInView, useMotionValue, useSpring } from "motion/react";
 import { ChevronDown, RotateCcw, Send } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import styles from "./hero-demo.module.css";
@@ -24,7 +24,7 @@ type DemoState = {
 export function HeroDemo() {
   const [demo, setDemo] = useState<DemoState>({ formatted: false, animated: false, phase: "raw" });
   const [font, setFont] = useState<DemoFont>("Georgia");
-  const reduced = useReducedMotion();
+  const [reduced, setReduced] = useState<boolean | null>(null);
   const stage = useRef<HTMLDivElement>(null);
   const inView = useInView(stage, { amount: 0.35 });
   const autoConsumed = useRef(false);
@@ -105,12 +105,22 @@ export function HeroDemo() {
   }, [resetDepth]);
 
   useEffect(() => {
-    if (!reduced) return;
-    autoConsumed.current = true;
-    cancelSequence();
-    resetDepth(true);
-    setDemo({ formatted: targetFormatted.current, animated: false, phase: targetFormatted.current ? "done" : "raw" });
-  }, [cancelSequence, reduced, resetDepth]);
+    // Motion 14.9.1's hook snapshots this preference, so subscribe explicitly
+    // to stop an active demonstration when the system setting changes.
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => {
+      if (query.matches) {
+        autoConsumed.current = true;
+        cancelSequence();
+        resetDepth(true);
+        setDemo({ formatted: targetFormatted.current, animated: false, phase: targetFormatted.current ? "done" : "raw" });
+      }
+      setReduced(query.matches);
+    };
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, [cancelSequence, resetDepth]);
 
   useEffect(() => cancelSequence, [cancelSequence]);
 
