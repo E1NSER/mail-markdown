@@ -41,7 +41,7 @@ Manrope and DM Mono use `next/font`: font files are fetched at build time and se
 
 CSS handles small transitions; Motion handles the product demo and section reveals. Product scenes subscribe directly to the reduced-motion media query so changing the preference also interrupts an active sequence. The shared motion provider, section reveals and CSS respect the same preference.
 
-The hero stages a single conversion when it enters view: key press, Markdown exit, formatted lines, then completion feedback. Replay and font controls interrupt pending steps immediately. Fine mouse pointers add restrained spring depth; touch, keyboard focus and reduced motion keep the window still. The icon scene uses a separate one-shot sequence to move a Markdown sheet behind the icon and bring the formatted mail forward. Neither scene runs an idle loop.
+The hero shows the complete AI-chat-to-Apple-Mail workflow once when it enters view: select Markdown in the chat, copy, press ⌘V, then insert formatted lines below existing draft text. The existing greeting, signature and new passage share the selected font, 16px size and text color. Copy, paste, replay and style controls interrupt pending steps immediately; the demo never reads or writes the system clipboard. Fine mouse pointers add restrained spring depth; touch, keyboard focus and reduced motion keep the window still. The icon scene uses a separate one-shot sequence to move a Markdown sheet behind the icon and bring the formatted mail forward. Neither scene runs an idle loop.
 
 `Reveal` keeps server-rendered content visible. After hydration, it enhances only offscreen sections with an entrance animation. Preserve this behavior so the page remains readable without JavaScript. Check keyboard access, narrow screens and reduced motion when changing interactions.
 
@@ -69,7 +69,7 @@ No release, a release missing its DMG, and a temporarily unavailable GitHub API 
 
 ## Reference notes
 
-The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a working native Mail specimen and an animated app-icon composition. The hero keeps a clean blue background and offers a font switch and an explicit formatting toggle; it plays the conversion once. The editable playground remains local. GitHub star counts are read server-side with five-minute caching; missing metadata hides the count instead of inventing one.
+The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand stage, oversized sans-serif typography, a chat-to-Mail composition and an animated app-icon scene. Headings stand on their own without marketing eyebrows. The hero keeps a clean blue background and offers font and color controls plus explicit copy, paste and replay actions. The editable playground remains local. GitHub star counts are read server-side with five-minute caching; missing metadata hides the count instead of inventing one.
 
 - [Superlist on Awwwards](https://www.awwwards.com/sites/superlist): concentrated brand color, large typography and a single product composition. [Button interaction reference](https://www.awwwards.com/inspiration/superlist-notification-button).
 - [Tezuka Reader in the Webflow Showcase](https://webflow.com/made-in-webflow/website/tezuka-reader), [live site](https://tezuka-xr.webflow.io/): native interface language and a large, focused product view.

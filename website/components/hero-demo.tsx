@@ -1,34 +1,39 @@
 "use client";
 
 import { motion, useInView, useMotionValue, useSpring } from "motion/react";
-import { ChevronDown, RotateCcw, Send } from "lucide-react";
+import { ArrowDown, Check, Copy, MessageSquare, RotateCcw, Send } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import styles from "./hero-demo.module.css";
 
-const rawMarkdown =
-  "**Hey Alex,**\n\ngute Nachrichten.\nDas Design ist *fertig*.\n\n- Ein klarer Plan.\n- Ein schönes Ergebnis.\n- Und ein bisschen weniger Arbeit.\n\nLiebe Grüße\nSam";
-
+const rawMarkdown = "Das Design ist **fertig**.\n\n- Feedback sammeln\n- Montag starten";
 const demoFonts = {
   Georgia: 'Georgia, "Times New Roman", serif',
   Helvetica: '"Helvetica Neue", Helvetica, Arial, sans-serif',
 } as const;
+const demoColors = {
+  "Mail-Blau": "#0759ae",
+  Graphit: "#26384c",
+} as const;
 type DemoFont = keyof typeof demoFonts;
-const fontNames = Object.keys(demoFonts) as DemoFont[];
-const ease = [0.22, 1, 0.36, 1] as const;
+type DemoColor = keyof typeof demoColors;
+type Goal = "ready" | "copied" | "done";
 type DemoState = {
+  phase: "ready" | "select" | "copied" | "paste" | "reveal" | "done";
+  copied: boolean;
   formatted: boolean;
   animated: boolean;
-  phase: "raw" | "press" | "convert" | "reveal" | "done";
 };
+const ease = [0.22, 1, 0.36, 1] as const;
 
 export function HeroDemo() {
-  const [demo, setDemo] = useState<DemoState>({ formatted: false, animated: false, phase: "raw" });
+  const [demo, setDemo] = useState<DemoState>({ phase: "ready", copied: false, formatted: false, animated: false });
   const [font, setFont] = useState<DemoFont>("Georgia");
+  const [color, setColor] = useState<DemoColor>("Mail-Blau");
   const [reduced, setReduced] = useState<boolean | null>(null);
   const stage = useRef<HTMLDivElement>(null);
-  const inView = useInView(stage, { amount: 0.35 });
+  const inView = useInView(stage, { amount: 0.75 });
   const autoConsumed = useRef(false);
-  const targetFormatted = useRef(false);
+  const goal = useRef<Goal>("done");
   const timers = useRef(new Set<number>());
   const generation = useRef(0);
   const finePointer = useRef(false);
@@ -62,34 +67,70 @@ export function HeroDemo() {
     }
   }, [rotateX, rotateY, tiltX, tiltY]);
 
-  const play = useCallback((replay = false) => {
+  const settle = useCallback((target: Goal) => {
+    setDemo({ phase: target, copied: target !== "ready", formatted: target === "done", animated: false });
+  }, []);
+
+  const begin = useCallback((target: Goal) => {
     cancelSequence();
     autoConsumed.current = true;
-    targetFormatted.current = true;
+    goal.current = target;
     resetDepth(true);
+  }, [cancelSequence, resetDepth]);
+
+  const play = useCallback(() => {
+    begin("done");
     if (reduced !== false) {
-      setDemo({ formatted: true, animated: false, phase: "done" });
+      settle("done");
       return;
     }
-    const press = () => {
-      setDemo({ formatted: false, animated: true, phase: "press" });
-      schedule(() => setDemo({ formatted: false, animated: true, phase: "convert" }), 130);
-      schedule(() => setDemo({ formatted: true, animated: true, phase: "reveal" }), 250);
-      schedule(() => setDemo({ formatted: true, animated: true, phase: "done" }), 940);
-    };
-    if (replay) {
-      setDemo({ formatted: false, animated: false, phase: "raw" });
-      schedule(press, 300);
-    } else {
-      press();
+    setDemo({ phase: "ready", copied: false, formatted: false, animated: true });
+    schedule(() => setDemo({ phase: "select", copied: false, formatted: false, animated: true }), 450);
+    schedule(() => setDemo({ phase: "copied", copied: true, formatted: false, animated: true }), 1_050);
+    schedule(() => setDemo({ phase: "paste", copied: true, formatted: false, animated: true }), 1_650);
+    schedule(() => setDemo({ phase: "reveal", copied: true, formatted: true, animated: true }), 1_810);
+    schedule(() => setDemo({ phase: "done", copied: true, formatted: true, animated: true }), 2_650);
+  }, [begin, reduced, schedule, settle]);
+
+  function copyInDemo() {
+    begin("copied");
+    if (reduced !== false) {
+      settle("copied");
+      return;
     }
-  }, [cancelSequence, reduced, resetDepth, schedule]);
+    setDemo({ phase: "select", copied: false, formatted: false, animated: true });
+    schedule(() => setDemo({ phase: "copied", copied: true, formatted: false, animated: true }), 550);
+  }
+
+  function pasteInDemo() {
+    if (!demo.copied) {
+      play();
+      return;
+    }
+    begin("done");
+    if (reduced !== false) {
+      settle("done");
+      return;
+    }
+    setDemo({ phase: "paste", copied: true, formatted: false, animated: true });
+    schedule(() => setDemo({ phase: "reveal", copied: true, formatted: true, animated: true }), 160);
+    schedule(() => setDemo({ phase: "done", copied: true, formatted: true, animated: true }), 1_000);
+  }
+
+  function changeStyle(nextFont?: DemoFont, nextColor?: DemoColor) {
+    cancelSequence();
+    autoConsumed.current = true;
+    resetDepth(true);
+    if (nextFont) setFont(nextFont);
+    if (nextColor) setColor(nextColor);
+    settle(goal.current);
+  }
 
   useEffect(() => {
     if (!inView || reduced !== false || autoConsumed.current) return;
     const timer = window.setTimeout(() => {
       if (!autoConsumed.current) play();
-    }, 1_200);
+    }, 750);
     return () => window.clearTimeout(timer);
   }, [inView, play, reduced]);
 
@@ -105,43 +146,23 @@ export function HeroDemo() {
   }, [resetDepth]);
 
   useEffect(() => {
-    // Motion 14.9.1's hook snapshots this preference, so subscribe explicitly
-    // to stop an active demonstration when the system setting changes.
+    // Subscribe directly: Motion 14.9.1's hook only snapshots the preference.
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => {
       if (query.matches) {
         autoConsumed.current = true;
         cancelSequence();
         resetDepth(true);
-        setDemo({ formatted: targetFormatted.current, animated: false, phase: targetFormatted.current ? "done" : "raw" });
+        settle(goal.current);
       }
       setReduced(query.matches);
     };
     update();
     query.addEventListener("change", update);
     return () => query.removeEventListener("change", update);
-  }, [cancelSequence, resetDepth]);
+  }, [cancelSequence, resetDepth, settle]);
 
   useEffect(() => cancelSequence, [cancelSequence]);
-
-  function toggleDemo() {
-    if (!targetFormatted.current) {
-      play();
-      return;
-    }
-    autoConsumed.current = true;
-    targetFormatted.current = false;
-    cancelSequence();
-    setDemo({ formatted: false, animated: false, phase: "raw" });
-  }
-
-  function selectFont(nextFont: DemoFont) {
-    autoConsumed.current = true;
-    targetFormatted.current = true;
-    cancelSequence();
-    setFont(nextFont);
-    setDemo({ formatted: true, animated: false, phase: "done" });
-  }
 
   function moveDepth(event: PointerEvent<HTMLDivElement>) {
     if (reduced !== false || !finePointer.current || focused.current || event.pointerType !== "mouse") return;
@@ -152,161 +173,106 @@ export function HeroDemo() {
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1));
     const y = Math.max(-1, Math.min(1, (event.clientY - bounds.top) / bounds.height * 2 - 1));
-    tiltX.set(y * -1.4);
-    tiltY.set(x * 1.8);
+    tiltX.set(y * -1);
+    tiltY.set(x * 1.2);
   }
 
   const animated = demo.animated && reduced === false;
-  const rawVisible = !demo.formatted && demo.phase !== "convert";
+  const selected = demo.phase === "select" || demo.phase === "copied" || demo.phase === "paste";
+  const complete = demo.phase === "done";
   const lineMotion = (index: number) => ({
     initial: false as const,
-    animate: { opacity: demo.formatted ? 1 : 0, y: demo.formatted || !animated ? 0 : 6 },
-    transition: { duration: animated ? 0.32 : 0, delay: animated && demo.formatted ? index * 0.045 : 0, ease },
+    animate: { opacity: demo.formatted ? 1 : 0, y: demo.formatted || !animated ? 0 : 5 },
+    transition: { duration: animated ? 0.36 : 0, delay: animated && demo.formatted ? index * 0.09 : 0, ease },
   });
-  const complete = demo.phase === "done";
 
   return (
-    <div
-      ref={stage}
-      className={`hero-scene ${styles.scene}`}
-      role="group"
-      aria-label="Browser-Demo: KI-Markdown in Apple Mail einfügen"
-    >
-      <div className="scene-topline">
-        <span>01</span>
-        <span>KI-MARKDOWN → APPLE MAIL</span>
+    <div ref={stage} className={`hero-scene ${styles.scene}`} role="group" aria-label="Browser-Demo: Markdown aus dem KI-Chat in Apple Mail einfügen">
+      <div className={styles.chatWindow}>
+        <div className={styles.chatHeader}>
+          <span><MessageSquare size={15} aria-hidden="true" /> KI-Chat</span>
+          <button type="button" className={styles.copyButton} onClick={copyInDemo} aria-label="Markdown in der Demo kopieren" aria-controls="hero-mail-preview">
+            {demo.copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
+            {demo.copied ? "Kopiert" : "Kopieren"}
+          </button>
+        </div>
+        <div className={styles.chatBody}>
+          <p className={styles.prompt}>Ein kurzes Projektupdate, bitte als Markdown.</p>
+          <pre className={styles.code} data-selected={selected}><code>{rawMarkdown}</code></pre>
+        </div>
       </div>
+
+      <div className={styles.handoff}>
+        <ArrowDown className={styles.flowArrow} size={19} aria-hidden="true" />
+        <motion.button
+          type="button"
+          className={styles.pasteKey}
+          initial={false}
+          animate={{ y: animated && demo.phase === "paste" ? 3 : 0 }}
+          transition={{ duration: animated ? 0.12 : 0, ease }}
+          onClick={pasteInDemo}
+          aria-label="KI-Text in der Apple-Mail-Demo einfügen"
+          aria-controls="hero-mail-preview"
+        ><span aria-hidden="true">⌘V</span></motion.button>
+        <span>In Apple Mail einfügen</span>
+      </div>
+
       <motion.div
-        className={`hero-window ${styles.window}`}
+        className={styles.mailWindow}
         initial={false}
         style={{ rotateX: reduced ? 0 : rotateX, rotateY: reduced ? 0 : rotateY, transformPerspective: 1_100 }}
         onPointerMove={moveDepth}
         onPointerLeave={() => resetDepth()}
         onPointerDownCapture={() => resetDepth(true)}
         onFocusCapture={() => { focused.current = true; resetDepth(true); }}
-        onBlurCapture={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget)) focused.current = false;
-        }}
+        onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) focused.current = false; }}
       >
-        <div className="window-titlebar">
-          <div className="traffic-lights" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-          </div>
-          <span>Apple Mail · Neuer Entwurf</span>
-          <span className="window-title-icon" aria-hidden="true">
-            <Send size={15} />
-          </span>
+        <div className={styles.mailHeader}>
+          <span className={styles.trafficLights} aria-hidden="true"><i /><i /><i /></span>
+          <span>Apple Mail</span>
+          <Send size={14} aria-hidden="true" />
         </div>
-        <div className="mail-fields">
-          <div>
-            <span>An:</span>
-            <span className="recipient">
-              Alex <ChevronDown size={10} aria-hidden="true" />
-            </span>
+        <div className={styles.mailFields}><span>An: <b>Alex</b></span><span>Betreff: <b>Projektupdate</b></span></div>
+        <div className={styles.formatBar}>
+          <div className={styles.fonts} role="group" aria-label="Vorhandene Schrift im Apple-Mail-Entwurf">
+            {(Object.keys(demoFonts) as DemoFont[]).map(name => (
+              <button key={name} type="button" aria-pressed={font === name} aria-controls="hero-mail-preview" onClick={() => changeStyle(name)}>{name}</button>
+            ))}
           </div>
-          <div>
-            <span>Betreff:</span>
-            <b>Gute Nachrichten ✨</b>
-          </div>
-        </div>
-        <div className="mail-formatbar">
-          <div
-            className="demo-fonts"
-            role="group"
-            aria-label="Schrift des Apple-Mail-Entwurfs in der Demo"
-          >
-            {fontNames.map((name) => (
-              <button
-                key={name}
-                type="button"
-                className="demo-font"
-                aria-pressed={font === name}
-                aria-controls="hero-mail-preview"
-                onClick={() => selectFont(name)}
-              >
-                {name}
+          <span className={styles.fontSize} aria-label="Schriftgröße 16 Pixel">16</span>
+          <div className={styles.colors} role="group" aria-label="Vorhandene Textfarbe im Apple-Mail-Entwurf">
+            {(Object.keys(demoColors) as DemoColor[]).map(name => (
+              <button key={name} type="button" className={styles.colorButton} aria-label={name} aria-pressed={color === name} aria-controls="hero-mail-preview" onClick={() => changeStyle(undefined, name)}>
+                <span style={{ backgroundColor: demoColors[name] }}>{color === name ? <Check size={12} aria-hidden="true" /> : null}</span>
               </button>
             ))}
           </div>
-          <i aria-hidden="true" />
-          <span aria-hidden="true">16</span>
-          <i aria-hidden="true" />
-          <strong aria-hidden="true">B</strong>
-          <em aria-hidden="true">I</em>
-          <u aria-hidden="true">U</u>
-          <span className="formatbar-color" aria-hidden="true" />
         </div>
-        <div className="hero-mail-content" id="hero-mail-preview">
-          <div className={styles.previewLayers}>
-              <div className={`mail-formatted ${styles.message}`} style={{ fontFamily: demoFonts[font] }} aria-hidden={!demo.formatted}>
-                <motion.p {...lineMotion(0)}>
-                  <strong>Hey Alex,</strong>
-                </motion.p>
-                <p>
-                  <motion.span className={styles.line} {...lineMotion(1)}>gute Nachrichten.</motion.span>
-                  <motion.span className={styles.line} {...lineMotion(2)}>Das Design ist <em>fertig</em>.</motion.span>
-                </p>
-                <ul>
-                  <motion.li {...lineMotion(3)}>Ein klarer Plan.</motion.li>
-                  <motion.li {...lineMotion(4)}>Ein schönes Ergebnis.</motion.li>
-                  <motion.li {...lineMotion(5)}>Und ein bisschen weniger Arbeit.</motion.li>
-                </ul>
-                <p>
-                  <motion.span className={styles.line} {...lineMotion(6)}>Liebe Grüße</motion.span>
-                  <motion.span className={styles.line} {...lineMotion(7)}>Sam</motion.span>
-                </p>
-              </div>
-              <motion.div
-                initial={false}
-                animate={{ opacity: rawVisible ? 1 : 0, y: animated && !rawVisible ? -3 : 0 }}
-                transition={{ duration: animated ? 0.12 : 0, ease }}
-                className={`mail-raw ${styles.message}`}
-                style={{ fontFamily: "var(--font-mono), monospace" }}
-                aria-hidden={demo.formatted}
-              >
-                {rawMarkdown}
-              </motion.div>
+        <div id="hero-mail-preview" className={styles.mailBody} style={{ fontFamily: demoFonts[font], color: demoColors[color] }}>
+          <p>Hallo Alex,</p>
+          <div className={styles.insertSlot}>
+            <div className={styles.insertHint} aria-hidden={demo.formatted} style={{ opacity: demo.formatted ? 0 : 1 }}><i aria-hidden="true" /><span>Hier wird eingefügt</span></div>
+            <div className={styles.inserted} aria-hidden={!demo.formatted}>
+              <motion.p {...lineMotion(0)}>Das Design ist <strong>fertig</strong>.</motion.p>
+              <ul>
+                <motion.li {...lineMotion(1)}>Feedback sammeln</motion.li>
+                <motion.li {...lineMotion(2)}>Montag starten</motion.li>
+              </ul>
+            </div>
           </div>
+          <p>Liebe Grüße<br />Sam</p>
         </div>
-        <div className="window-footer">
-          <span
-            className={complete ? "demo-status complete" : "demo-status"}
-            role="status"
-          >
-            <i className={styles.statusSymbol} aria-hidden="true">
-              <span className={styles.statusDot} style={{ opacity: complete ? 0 : 1 }} />
-              <svg viewBox="0 0 16 16" width="14" height="14" fill="none">
-                <motion.path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" initial={false} animate={{ pathLength: complete ? 1 : 0, opacity: complete ? 1 : 0 }} transition={{ duration: animated ? 0.24 : 0, ease }} />
-              </svg>
-            </i>
-            {complete ? "Im Stil deines Mail-Entwurfs." : demo.phase === "raw" ? "Markdown aus deinem KI-Chat." : "Mail-Stil wird übernommen."}
+        <div className={styles.mailFooter}>
+          <span role="status" className={styles.status}>
+            {complete ? <Check size={13} aria-hidden="true" /> : <span className={styles.statusDot} aria-hidden="true" />}
+            {complete ? "Mail-Stil übernommen" : demo.phase === "paste" || demo.phase === "reveal" ? "Wird eingefügt …" : demo.phase === "copied" ? "Markdown kopiert" : "Dein bestehender Entwurf"}
           </span>
+          <span className={styles.styleValue}>{font} · 16 · {color}</span>
         </div>
       </motion.div>
-      <div className="paste-control">
-        <motion.button
-          type="button"
-          className={`paste-key ${styles.key}`}
-          initial={false}
-          animate={{ y: animated && demo.phase === "press" ? 3 : 0 }}
-          transition={{ duration: animated ? (demo.phase === "press" ? 0.08 : 0.18) : 0, ease }}
-          onClick={toggleDemo}
-          aria-label="Einfügen von KI-Markdown in der Apple-Mail-Demo umschalten"
-          aria-pressed={targetFormatted.current}
-          aria-controls="hero-mail-preview"
-        >
-          <span aria-hidden="true">⌘</span>
-          <span aria-hidden="true">V</span>
-        </motion.button>
-        <div>
-          <span className="paste-control-label">Einfügen in Apple Mail.</span>
-          <button type="button" className={`paste-control-hint ${styles.replay}`} onClick={() => play(true)} aria-controls="hero-mail-preview"><RotateCcw size={12} aria-hidden="true" /> Demo wiederholen</button>
-        </div>
-      </div>
-      <div className="scene-caption">
-        Browser-Demo des Einfügens. Keine Verbindung zu Apple Mail.
+      <div className={styles.sceneFooter}>
+        <button type="button" className={styles.replay} onClick={play}><RotateCcw size={13} aria-hidden="true" /> Ablauf wiederholen</button>
+        <span>Browser-Demo ohne Zugriff auf Mail oder Zwischenablage.</span>
       </div>
     </div>
   );

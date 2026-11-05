@@ -84,9 +84,6 @@ export default async function Home() {
           <div className="hero-band">
             <section className="hero section-wrap" aria-labelledby="hero-title">
               <div className="hero-copy">
-                <div className="eyebrow hero-eyebrow">
-                  <span className="tiny-dot" /> DIE MARKDOWN-ERWEITERUNG FÜR APPLE MAIL
-                </div>
                 <h1 id="hero-title">
                   Dein KI-Text.
                   <br />
@@ -94,8 +91,8 @@ export default async function Home() {
                 </h1>
                 <p className="hero-description">
                   Kopiere Markdown aus deinem KI-Chat und füge ihn mit ⌘V
-                  direkt in Apple Mail ein. Mail Markdown übernimmt die Schrift,
-                  Größe und Farbe deines bestehenden Entwurfs.
+                  direkt in Apple Mail ein. Die Erweiterung übernimmt dabei
+                  Schrift, Größe und Farbe deines bestehenden Entwurfs.
                 </p>
                 <div className="hero-actions">
                   <DownloadButton
@@ -122,7 +119,6 @@ export default async function Home() {
             <div className="section-wrap">
               <Reveal className="play-heading">
                 <div>
-                  <div className="eyebrow">01 — AUS DEM KI-CHAT IN DEINE MAIL</div>
                   <h2>
                     KI-Mail rein.
                     <br />
@@ -147,7 +143,6 @@ export default async function Home() {
                 <Playground />
               </Reveal>
               <div className="supported-formats">
-                <span>VON KLEINEN AKZENTEN BIS ZUR KLAREN STRUKTUR.</span>
                 <div>
                   <b>Fett</b>
                   <i>Kursiv</i>
@@ -163,7 +158,6 @@ export default async function Home() {
           <section className="source-section" id="open-source">
             <div className="source-inner section-wrap">
               <Reveal>
-                <div className="eyebrow">AUS WIEN. FÜR DEINEN WORKFLOW.</div>
                 <h2>
                   Gute Tools
                   <br />
@@ -188,7 +182,6 @@ export default async function Home() {
 
           <section className="faq-section section-wrap">
             <Reveal className="faq-heading">
-              <div className="eyebrow">02 — GUT ZU WISSEN</div>
               <h2>Die Details.</h2>
               <p>Die Details, bevor du loslegst.</p>
             </Reveal>
@@ -213,7 +206,6 @@ export default async function Home() {
                 width={94}
                 height={94}
               />
-              <div className="eyebrow">DIE ERWEITERUNG FÜR DEIN ⌘V</div>
               <h2>
                 Dein nächster KI-Text.
                 <br />
