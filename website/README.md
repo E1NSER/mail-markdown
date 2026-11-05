@@ -53,6 +53,11 @@ vercel --prod
 
 ## Reference notes
 
+The current visual direction uses pearl surfaces, ink navy, italic Georgia accents and an original envelope-shaped product stage. The split hero, Mail illustration and keyboard interaction keep it distinct from the reference.
+
+- [Calendly hero](https://mobbin.com/sites/sections/1aecb2bd-9275-46c8-bd6a-ab20e3847941): warm framing, navy type and dark actions.
+- [Calendly feature section](https://mobbin.com/sites/sections/959d4e5e-ecc6-4995-b084-ed17dc74724f): serif section typography and a large, concentrated illustration area.
+
 These inspected Mobbin captures informed the layout. They are static references and do not establish animation or interaction behavior:
 
 - [Sketch](https://mobbin.com/sites/sections/a8e27ceb-5766-47e1-922e-e320d5a95fa0?utm_source=chatgpt&utm_medium=ai-assistant&utm_source_platform=mcp): centered Mac-focused headline, a feature chooser and a large application window.

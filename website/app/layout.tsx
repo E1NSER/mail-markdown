@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, DM_Mono } from "next/font/google";
 import "./globals.css";
+import "./brand.css";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -17,7 +18,7 @@ const mono = DM_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://mail-markdown.vercel.app"),
   title: {
-    default: "Mail Markdown — Markdown rein. Dein Stil bleibt.",
+    default: "Mail Markdown — Deine Worte. Dein Stil.",
     template: "%s · Mail Markdown",
   },
   description:
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   applicationName: "Mail Markdown",
   authors: [{ name: "E1NSER.", url: "https://einser.at" }],
   openGraph: {
-    title: "Markdown rein. Dein Stil bleibt.",
+    title: "Deine Worte. Dein Stil.",
     description: "Markdown für Apple Mail. Kostenlos, lokal und Open Source.",
     locale: "de_AT",
     type: "website",

@@ -35,8 +35,11 @@ export function HeroDemo() {
       ref={scene}
       aria-label="Animierte Beispieldarstellung eines Mail-Entwurfs"
     >
-      <div className="scene-orbit orbit-one" aria-hidden="true" />
-      <div className="scene-orbit orbit-two" aria-hidden="true" />
+      <div className="mail-stage" aria-hidden="true">
+        <svg viewBox="0 0 600 500" fill="none" preserveAspectRatio="none">
+          <path d="M24 78 300 285 576 78M24 462 224 290M576 462 376 290" />
+        </svg>
+      </div>
       <motion.div
         className="source-note"
         initial={{ opacity: 0, x: -20, rotate: -9 }}

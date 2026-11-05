@@ -62,18 +62,17 @@ export default function Home() {
           <section className="hero section-wrap">
             <div className="hero-copy">
               <div className="eyebrow hero-eyebrow">
-                <span className="tiny-dot" /> GEMACHT FÜR DEINEN MAC
+                <span className="tiny-dot" /> Markdown für Apple Mail
               </div>
               <h1>
-                Markdown rein.
+                Deine Worte.
                 <br />
-                <span>Dein Stil bleibt.</span>
+                <span>Dein Stil.</span>
               </h1>
               <p className="hero-description">
-                Deine Gedanken sind schon gut.
-                <br />
-                Jetzt sehen sie auch so aus – direkt in Apple Mail, mit einem
-                vertrauten <kbd>⌘V</kbd>.
+                Aus Markdown wird eine richtig gute Mail. Mit einem{" "}
+                <kbd>⌘V</kbd> – und genau der Schrift, Größe und Farbe deines
+                Entwurfs.
               </p>
               <div className="hero-actions">
                 <a className="button button-primary" href="#starten">
@@ -336,9 +335,6 @@ export default function Home() {
                     <span>Mit Liebe aus Wien. ↗</span>
                   </div>
                 </div>
-                <span className="source-floating-brace" aria-hidden="true">
-                  &#123; &#125;
-                </span>
               </Reveal>
             </div>
           </section>
