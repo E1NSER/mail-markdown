@@ -21,7 +21,7 @@ The fixed [latest installer link](https://github.com/E1NSER/mail-markdown/releas
 
 The current architecture targets direct distribution. It uses Accessibility to read the draft's text style and a keyboard event tap to handle paste. It is installed separately and does not appear in Mail's Extensions settings. See [Mac App Store feasibility](docs/APP_STORE_FEASIBILITY.md) for the sandbox constraints and a possible separate Services implementation.
 
-The Mail Native interface has a compact sidebar, native controls and automatic light/dark appearance. The upcoming **1.2.0** release adds English as the default and German under **General → System → Language**. Your selection is saved and applies immediately. This localization is available in source and local builds; the public installer remains **1.1.0** until the new notarization completes.
+The Mail Native interface has a compact sidebar, native controls and automatic light/dark appearance. **Version 1.2.0** uses English by default and offers German under **General → System → Language**. Your selection is saved and applies immediately. The Universal installer is signed with Developer ID and notarized by Apple.
 
 ## Requirements
 

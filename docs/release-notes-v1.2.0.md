@@ -1,5 +1,3 @@
-**Release candidate — public installer pending Apple notarization.**
-
 Mail Markdown 1.2.0 adds English as the default interface language, with a complete German translation.
 
 - Switch between **English** and **Deutsch** in **General → System → Language**.
@@ -7,7 +5,7 @@ Mail Markdown 1.2.0 adds English as the default interface language, with a compl
 - Custom Markdown entered in the preview stays intact when you switch languages.
 - The website now defaults to English and offers a German version, including examples, FAQs, privacy information and cookie settings.
 
-**Prepared installer:** Universal app for Apple Silicon and Intel, macOS 13 or later, signed with Developer ID. The public `Mail-Markdown-universal-notarized.dmg` and `SHA256SUMS` will be published after successful Apple notarization.
+**Download:** `Mail-Markdown-universal-notarized.dmg`, a Developer-ID-signed and Apple-notarized Universal app for Apple Silicon and Intel, macOS 13 or later. Both the app and DMG include their validated Apple notarization tickets. `SHA256SUMS` contains the checksum.
 
 **Install or update:** Quit older running copies. Open the DMG, drag Mail Markdown into Applications, then open it from there. If macOS requests it, allow the installed copy under **System Settings → Privacy & Security → Accessibility**.
 
