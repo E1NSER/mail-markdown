@@ -3,8 +3,10 @@
 import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import styles from "./hero-ambient.module.css";
+import { useLocale } from "./locale-provider";
 
 export function HeroAmbient() {
+  const de = useLocale() === "de";
   const layer = useRef<HTMLDivElement>(null);
   const frontPlane = useRef<HTMLDivElement>(null);
   const backPlane = useRef<HTMLDivElement>(null);
@@ -123,9 +125,9 @@ export function HeroAmbient() {
   }, [running]);
 
   const label = reduced === null
-    ? "Hintergrundanimation"
-    : reduced ? "Bewegung reduziert"
-    : paused ? "Animation fortsetzen" : "Animation pausieren";
+    ? (de ? "Hintergrundanimation" : "Background animation")
+    : reduced ? (de ? "Bewegung reduziert" : "Reduced motion")
+    : paused ? (de ? "Animation fortsetzen" : "Resume animation") : (de ? "Animation pausieren" : "Pause animation");
 
   return (
     <>
@@ -141,7 +143,7 @@ export function HeroAmbient() {
         <button
           type="button"
           className={styles.toggle}
-          aria-label={reduced ? "Hintergrundanimation durch Systemeinstellung deaktiviert" : label}
+          aria-label={reduced ? (de ? "Hintergrundanimation durch Systemeinstellung deaktiviert" : "Background animation disabled by system preference") : label}
           aria-controls="hero-ambient"
           disabled={reduced !== false}
           onClick={() => setPaused(value => !value)}

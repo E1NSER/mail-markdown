@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowDown, ArrowUpRight, Monitor, Plus } from "lucide-react";
@@ -11,15 +10,19 @@ import { DownloadButton } from "@/components/download-button";
 import { GitHubButton } from "@/components/github-button";
 import { AppIconScene } from "@/components/app-icon-scene";
 import { CookieSettingsButton } from "@/components/consent-provider";
-import { getRepositoryStars } from "@/lib/github-repository";
-import { getLatestRelease } from "@/lib/github-release";
 import { RELEASES_URL, type ReleaseState } from "@/lib/release-model";
 
-const repo = "https://github.com/E1NSER/mail-markdown";
-export const metadata: Metadata = { alternates: { canonical: "/" } };
-export const revalidate = 300;
+import { localePath, type Locale } from "@/lib/i18n";
 
-function downloadAnswer(release: ReleaseState): string {
+const repo = "https://github.com/E1NSER/mail-markdown";
+
+function downloadAnswer(release: ReleaseState, locale: Locale): string {
+  if (locale === "en") {
+    if (release.status === "available") return "Use ‘Download for macOS’ to get the Universal DMG from the latest stable GitHub release. Open the DMG, drag Mail Markdown into Applications, then grant Accessibility permission to the app.";
+    if (release.status === "not-published") return "The first public Mac release is being prepared. A direct download will appear here when it is available. Until then, you can build Mail Markdown using the instructions on GitHub.";
+    if (release.status === "no-download") return "The latest GitHub release does not have a Universal DMG yet. Check its status on GitHub or build the app from source.";
+    return "The download status is unavailable right now. Check GitHub Releases or use the build instructions there.";
+  }
   if (release.status === "available")
     return "Über „Für macOS laden“ erhältst du direkt das Universal-DMG des neuesten stabilen GitHub-Releases. Öffne das DMG und ziehe Mail Markdown in den Programme-Ordner. Aktiviere anschließend die Bedienungshilfen-Freigabe für die App.";
   if (release.status === "not-published")
@@ -29,7 +32,18 @@ function downloadAnswer(release: ReleaseState): string {
   return "Der Download-Status ist gerade nicht abrufbar. Prüfe die Releases auf GitHub oder nutze dort die Anleitung zum Selbstbauen.";
 }
 
-function getFaqs(release: ReleaseState) {
+function getFaqs(release: ReleaseState, locale: Locale) {
+  if (locale === "en") return [
+    ["How does Mail Markdown extend Apple Mail?", "Mail Markdown adds Markdown formatting to ⌘V directly in Apple Mail. You still write and send messages in your familiar Mail editor. The companion runs as a separate app in the macOS menu bar. It is installed separately and does not appear in Mail’s Extensions settings."],
+    ["How do I use email text from an AI chat?", "Ask for your email as Markdown. Copy the Markdown source, including asterisks, list markers and links, then paste it with ⌘V into an existing Apple Mail draft. Mail Markdown turns it into real formatting using your draft’s font, size and color."],
+    ["What happens to copied black backgrounds?", "When it recognizes Markdown, Mail Markdown rebuilds the formatting using your draft’s style. Fonts, colors and backgrounds from the source are not imported during this conversion. It does not automatically clean up text that was already pasted incorrectly. Without recognized Markdown or a readable style sample, Apple Mail’s normal paste behavior applies."],
+    ["Is Mail Markdown really free?", "Yes. The app is free and unlimited. There is no subscription, account or Markdown quota. Its source code is available on GitHub under the MIT License."],
+    ["How do I get the app?", downloadAnswer(release, locale)],
+    ["What stays from my Mail style?", "The app samples the font, size and text color from a neighboring character in your draft. Markdown adds formatting such as bold, italic, lists and links. Headings retain the font size; code uses a monospaced font at the same size."],
+    ["What happens to my messages?", "The app processes text locally on your Mac. There is no conversion server or analytics. It needs Accessibility permission to read the draft style. A temporary in-memory copy lets you restore the original clipboard."],
+    ["Does it work in every draft?", "You need a Rich Text draft in Apple Mail with existing text to sample. In an empty draft, or if the font cannot be read, text is pasted normally. Automatic conversion uses the regular ⌘V shortcut; paste from menus is not intercepted."],
+    ["Is the app in the Mac App Store?", "Not currently. Mail Markdown is a standalone companion app for Apple Mail. Its current Accessibility integration requires direct distribution. An App Store version would need a different workflow."],
+  ];
   return [
     [
       "Wie erweitert Mail Markdown Apple Mail?",
@@ -47,7 +61,7 @@ function getFaqs(release: ReleaseState) {
       "Ist Mail Markdown wirklich kostenlos?",
       "Ja. Die App ist kostenlos und unbegrenzt nutzbar. Es gibt kein Abo, kein Konto und kein Limit für deine Markdown-Texte. Der Quellcode steht unter der MIT-Lizenz auf GitHub.",
     ],
-    ["Wie bekomme ich die App?", downloadAnswer(release)],
+    ["Wie bekomme ich die App?", downloadAnswer(release, locale)],
     [
       "Was bleibt von meinem Mail-Stil erhalten?",
       "Die App übernimmt Schriftart, Schriftgröße und Textfarbe aus einem benachbarten Zeichen im Entwurf. Markdown ergänzt dazu zum Beispiel Fett- und Kursivschrift, Listen und Links. Überschriften behalten die Schriftgröße; Code erscheint in einer gleich großen Monospace-Schrift.",
@@ -67,17 +81,14 @@ function getFaqs(release: ReleaseState) {
   ];
 }
 
-export default async function Home() {
-  const [release, stars] = await Promise.all([
-    getLatestRelease(),
-    getRepositoryStars(),
-  ]);
+export function LandingPage({ locale, release, stars }: { locale: Locale; release: ReleaseState; stars: number | null }) {
+  const t = (english: string, german: string) => locale === "de" ? german : english;
   const downloadAvailable = release.status === "available";
-  const faqs = getFaqs(release);
+  const faqs = getFaqs(release, locale);
   return (
     <MotionProvider>
       <a className="skip-link" href="#inhalt">
-        Zum Inhalt
+        {t("Skip to content", "Zum Inhalt")}
       </a>
       <div className="site-shell">
         <SiteNav downloadAvailable={downloadAvailable} stars={stars} />
@@ -86,13 +97,12 @@ export default async function Home() {
             <section className="hero section-wrap" aria-labelledby="hero-title">
               <div className="hero-copy">
                 <h1 id="hero-title">
-                  Dein KI-Text.
+                  {t("Your AI text.", "Dein KI-Text.")}
                   <br />
                   <span>In Apple Mail.</span>
                 </h1>
                 <p className="hero-description">
-                  Füge Markdown aus deinem KI-Chat mit ⌘V in Apple Mail ein.
-                  Die Erweiterung übernimmt Schrift, Größe und Farbe deines Entwurfs.
+                  {t("Paste Markdown from your AI chat into Apple Mail with ⌘V. The extension uses your draft’s font, size and color.", "Füge Markdown aus deinem KI-Chat mit ⌘V in Apple Mail ein. Die Erweiterung übernimmt Schrift, Größe und Farbe deines Entwurfs.")}
                 </p>
                 <div className="hero-actions">
                   <DownloadButton
@@ -101,14 +111,14 @@ export default async function Home() {
                     location="hero"
                   />
                   <a className="button button-text" href="#spielplatz">
-                    Probier’s aus <ArrowDown size={17} />
+                    {t("Try it out", "Probier’s aus")} <ArrowDown size={17} />
                   </a>
                 </div>
                 <div className="hero-facts">
                   <span>
                     <Monitor size={14} /> macOS 13+
                   </span>
-                  <span>Kostenlos. Ohne Limit.</span>
+                  <span>{t("Free. No limits.", "Kostenlos. Ohne Limit.")}</span>
                 </div>
               </div>
               <HeroDemo />
@@ -121,21 +131,18 @@ export default async function Home() {
               <Reveal className="play-heading">
                 <div>
                   <h2>
-                    KI-Mail rein.
+                    {t("AI-written email.", "KI-Mail rein.")}
                     <br />
-                    <span>Dein Stil bleibt.</span>
+                    <span>{t("Your style stays.", "Dein Stil bleibt.")}</span>
                   </h2>
                 </div>
                 <div className="play-intro">
                   <div className="play-explanation">
                     <p>
-                      Rich Text aus dem KI-Chat bringt oft fremde Schriften,
-                      Farben oder schwarze Hintergründe mit. Reines Markdown
-                      wiederum zeigt Apple Mail als Sternchen und Listenzeichen.
+                      {t("Rich text from an AI chat often brings unwanted fonts, colors or black backgrounds. Plain Markdown appears in Apple Mail as asterisks and list markers.", "Rich Text aus dem KI-Chat bringt oft fremde Schriften, Farben oder schwarze Hintergründe mit. Reines Markdown wiederum zeigt Apple Mail als Sternchen und Listenzeichen.")}
                     </p>
                     <p>
-                      Mail Markdown ergänzt dein ⌘V: Die Erweiterung formatiert
-                      Markdown direkt in Apple Mail – im Stil deines Entwurfs.
+                      {t("Mail Markdown extends your ⌘V: it formats Markdown directly in Apple Mail, using the style of your draft.", "Mail Markdown ergänzt dein ⌘V: Die Erweiterung formatiert Markdown direkt in Apple Mail – im Stil deines Entwurfs.")}
                     </p>
                   </div>
                 </div>
@@ -145,12 +152,12 @@ export default async function Home() {
               </Reveal>
               <div className="supported-formats">
                 <div>
-                  <b>Fett</b>
-                  <i>Kursiv</i>
-                  <span>≡ Listen</span>
+                  <b>{t("Bold", "Fett")}</b>
+                  <i>{t("Italic", "Kursiv")}</i>
+                  <span>≡ {t("Lists", "Listen")}</span>
                   <span className="format-link">Links ↗</span>
                   <span className="format-code">`Code`</span>
-                  <span>❝ Zitate</span>
+                  <span>❝ {t("Quotes", "Zitate")}</span>
                 </div>
               </div>
             </div>
@@ -160,13 +167,12 @@ export default async function Home() {
             <div className="source-inner section-wrap">
               <Reveal>
                 <h2>
-                  Gute Tools
+                  {t("Good tools", "Gute Tools")}
                   <br />
-                  sind zum Teilen da.
+                  {t("are worth sharing.", "sind zum Teilen da.")}
                 </h2>
                 <p>
-                  Ein kostenloses Projekt von E1NSER. Schau in den Code, melde
-                  einen Fehler oder mach deine eigene Idee daraus.
+                  {t("A free project by E1NSER. Explore the code, report a bug or build on it with your own ideas.", "Ein kostenloses Projekt von E1NSER. Schau in den Code, melde einen Fehler oder mach deine eigene Idee daraus.")}
                 </p>
                 <div className="section-actions">
                   <DownloadButton
@@ -183,8 +189,8 @@ export default async function Home() {
 
           <section className="faq-section section-wrap">
             <Reveal className="faq-heading">
-              <h2>Die Details.</h2>
-              <p>Die Details, bevor du loslegst.</p>
+              <h2>{t("The details.", "Die Details.")}</h2>
+              <p>{t("A few things to know before you start.", "Die Details, bevor du loslegst.")}</p>
             </Reveal>
             <div className="faq-list">
               {faqs.map(([question, answer]) => (
@@ -203,16 +209,16 @@ export default async function Home() {
             <Reveal className="start-inner">
               <Image
                 src="/app-icon.svg"
-                alt="Mail Markdown App-Icon"
+                alt={t("Mail Markdown app icon", "Mail Markdown App-Icon")}
                 width={94}
                 height={94}
               />
               <h2>
-                Dein nächster KI-Text.
+                {t("Your next AI text.", "Dein nächster KI-Text.")}
                 <br />
-                <span>Im Stil deiner Mail.</span>
+                <span>{t("In your Mail style.", "Im Stil deiner Mail.")}</span>
               </h2>
-              <p>Markdown mit ⌘V direkt in Apple Mail einfügen. Kostenlos und unbegrenzt.</p>
+              <p>{t("Paste Markdown straight into Apple Mail with ⌘V. Free and unlimited.", "Markdown mit ⌘V direkt in Apple Mail einfügen. Kostenlos und unbegrenzt.")}</p>
               <div className="section-actions start-actions">
                 <DownloadButton
                   className="button button-primary"
@@ -224,31 +230,31 @@ export default async function Home() {
               <span className="start-note" id="download-availability">
                 {release.status === "available" ? (
                   <>
-                    {release.version} · Universal-DMG · kostenlos
+                    {release.version} · {t("Universal DMG", "Universal-DMG")} · {t("free", "kostenlos")}
                     <br />
                     <a href={`${RELEASES_URL}/latest`}>
-                      Release-Notes ansehen ↗
+                      {t("Read release notes", "Release-Notes ansehen")} ↗
                     </a>
                   </>
                 ) : release.status === "not-published" ? (
                   <>
-                    Der erste öffentliche Mac-Release wird vorbereitet.
+                    {t("The first public Mac release is being prepared.", "Der erste öffentliche Mac-Release wird vorbereitet.")}
                     <br />
-                    Den Quellcode findest du auf GitHub.
+                    {t("The source code is available on GitHub.", "Den Quellcode findest du auf GitHub.")}
                   </>
                 ) : release.status === "no-download" ? (
                   <>
-                    Für {release.version} ist noch kein Mac-Download verfügbar.
+                    {t(`A Mac download is not yet available for ${release.version}.`, `Für ${release.version} ist noch kein Mac-Download verfügbar.`)}
                     <br />
                     <a href={RELEASES_URL}>
-                      Release-Status auf GitHub ansehen ↗
+                      {t("Check release status on GitHub", "Release-Status auf GitHub ansehen")} ↗
                     </a>
                   </>
                 ) : (
                   <>
-                    Der Download-Status ist gerade nicht abrufbar.
+                    {t("The download status is unavailable right now.", "Der Download-Status ist gerade nicht abrufbar.")}
                     <br />
-                    <a href={RELEASES_URL}>Releases auf GitHub prüfen ↗</a>
+                    <a href={RELEASES_URL}>{t("Check releases on GitHub", "Releases auf GitHub prüfen")} ↗</a>
                   </>
                 )}
               </span>
@@ -259,27 +265,26 @@ export default async function Home() {
           </section>
         </main>
         <footer className="site-footer section-wrap">
-          <a className="footer-brand" href="#">
+          <a className="footer-brand" href={localePath(locale)}>
             Mail Markdown<span>.</span>
           </a>
           <span className="footer-credit">
-            Ein kleines Tool von{" "}
+            {t("A small tool by", "Ein kleines Tool von")}{" "}
             <a href="https://einser.at" target="_blank" rel="noreferrer">
               E1NSER. <ArrowUpRight size={12} />
             </a>
           </span>
-          <nav aria-label="Footer">
+          <nav aria-label={t("Footer navigation", "Footer")}>
             <a href={repo} target="_blank" rel="noreferrer">
               GitHub
             </a>
-            <Link href="/datenschutz">Datenschutz</Link>
-            <Link href="/impressum">Impressum</Link>
+            <Link href={localePath(locale, "/privacy")}>{t("Privacy", "Datenschutz")}</Link>
+            <Link href={localePath(locale, "/legal-notice")}>{t("Legal notice", "Impressum")}</Link>
             <CookieSettingsButton className="footer-cookie-settings" />
           </nav>
         </footer>
         <div className="trademark-note section-wrap">
-          Ein unabhängiges Projekt. Apple und Apple Mail sind Marken von Apple
-          Inc.
+          {t("An independent project. Apple and Apple Mail are trademarks of Apple Inc.", "Ein unabhängiges Projekt. Apple und Apple Mail sind Marken von Apple Inc.")}
         </div>
       </div>
     </MotionProvider>

@@ -4,6 +4,7 @@ import { motion, useInView, useMotionValue, useSpring } from "motion/react";
 import { Check, Copy, MessageSquare, RotateCcw, Send } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import styles from "./hero-demo.module.css";
+import { useLocale } from "./locale-provider";
 
 const demoFonts = {
   Georgia: 'Georgia, "Times New Roman", serif',
@@ -25,6 +26,10 @@ type DemoState = {
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export function HeroDemo() {
+  const de = useLocale() === "de";
+  const colorLabels: Record<DemoColor, string> = de
+    ? { "Mail-Blau": "Mail-Blau", Graphit: "Graphit" }
+    : { "Mail-Blau": "Mail blue", Graphit: "Graphite" };
   const [demo, setDemo] = useState<DemoState>({ phase: "ready", copied: false, formatted: false, animated: false });
   const [font, setFont] = useState<DemoFont>("Georgia");
   const [color, setColor] = useState<DemoColor>("Mail-Blau");
@@ -186,23 +191,23 @@ export function HeroDemo() {
   });
 
   return (
-    <div ref={stage} className={`hero-scene ${styles.scene}`} data-phase={demo.phase} role="group" aria-label="Browser-Demo: Markdown aus dem KI-Chat in Apple Mail einfügen">
+    <div ref={stage} className={`hero-scene ${styles.scene}`} data-phase={demo.phase} role="group" aria-label={de ? "Browser-Demo: Markdown aus dem KI-Chat in Apple Mail einfügen" : "Browser demo: paste Markdown from an AI chat into Apple Mail"}>
       <div className={styles.composition}>
         <motion.div className={styles.chatWindow} initial={false} animate={{ y: demo.formatted && animated ? -6 : 0 }} transition={{ duration: animated ? 0.7 : 0, ease }}>
           <div className={styles.chatHeader}>
-            <span><MessageSquare size={15} aria-hidden="true" /> KI-Chat</span>
-            <button type="button" className={styles.copyButton} onClick={copyInDemo} aria-label="Markdown in der Demo kopieren" aria-controls="hero-mail-preview">
+            <span><MessageSquare size={15} aria-hidden="true" /> {de ? "KI-Chat" : "AI chat"}</span>
+            <button type="button" className={styles.copyButton} onClick={copyInDemo} aria-label={de ? "Markdown in der Demo kopieren" : "Copy Markdown in the demo"} aria-controls="hero-mail-preview">
               {demo.copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
-              {demo.copied ? "Kopiert" : "Kopieren"}
+              {demo.copied ? (de ? "Kopiert" : "Copied") : (de ? "Kopieren" : "Copy")}
             </button>
           </div>
           <div className={styles.chatBody}>
-            <p className={styles.prompt}>Ein Projektupdate als Markdown, bitte.</p>
+            <p className={styles.prompt}>{de ? "Ein Projektupdate als Markdown, bitte." : "A project update in Markdown, please."}</p>
             <pre className={styles.code} data-selected={selected}>
               <code>
-                <span>Das Design ist <span className={styles.markdownToken}>**</span>fertig<span className={styles.markdownToken}>**</span>.</span>{"\n"}
-                <span><span className={styles.markdownToken}>-</span> Feedback sammeln</span>{"\n"}
-                <span><span className={styles.markdownToken}>-</span> Montag starten</span>
+                <span>{de ? "Das Design ist " : "The design is "}<span className={styles.markdownToken}>**</span>{de ? "fertig" : "ready"}<span className={styles.markdownToken}>**</span>.</span>{"\n"}
+                <span><span className={styles.markdownToken}>-</span> {de ? "Feedback sammeln" : "Gather feedback"}</span>{"\n"}
+                <span><span className={styles.markdownToken}>-</span> {de ? "Montag starten" : "Launch on Monday"}</span>
               </code>
             </pre>
           </div>
@@ -217,10 +222,10 @@ export function HeroDemo() {
             animate={{ y: animated && demo.phase === "paste" ? 3 : 0 }}
             transition={{ duration: animated ? 0.12 : 0, ease }}
             onClick={pasteInDemo}
-            aria-label="KI-Text in der Apple-Mail-Demo einfügen"
+            aria-label={de ? "KI-Text in der Apple-Mail-Demo einfügen" : "Paste AI text in the Apple Mail demo"}
             aria-controls="hero-mail-preview"
           ><span aria-hidden="true">⌘V</span></motion.button>
-          <span>Einfügen.<br />Stil behalten.</span>
+          <span>{de ? "Einfügen." : "Paste."}<br />{de ? "Stil behalten." : "Keep your style."}</span>
         </div>
 
         <motion.div
@@ -238,48 +243,48 @@ export function HeroDemo() {
             <span>Apple Mail</span>
             <Send size={14} aria-hidden="true" />
           </div>
-          <div className={styles.mailFields}><span>An: <b>Alex</b></span><span>Betreff: <b>Projektupdate</b></span></div>
+          <div className={styles.mailFields}><span>{de ? "An:" : "To:"} <b>Alex</b></span><span>{de ? "Betreff:" : "Subject:"} <b>{de ? "Projektupdate" : "Project update"}</b></span></div>
           <div className={styles.formatBar}>
-            <div className={styles.fonts} role="group" aria-label="Vorhandene Schrift im Apple-Mail-Entwurf">
+            <div className={styles.fonts} role="group" aria-label={de ? "Vorhandene Schrift im Apple-Mail-Entwurf" : "Existing font in the Apple Mail draft"}>
               {(Object.keys(demoFonts) as DemoFont[]).map(name => (
                 <button key={name} type="button" aria-pressed={font === name} aria-controls="hero-mail-preview" onClick={() => changeStyle(name)}>{name}</button>
               ))}
             </div>
-            <span className={styles.fontSize} aria-label="Schriftgröße 16 Pixel">16</span>
-            <div className={styles.colors} role="group" aria-label="Vorhandene Textfarbe im Apple-Mail-Entwurf">
+            <span className={styles.fontSize} aria-label={de ? "Schriftgröße 16 Pixel" : "Font size 16 pixels"}>16</span>
+            <div className={styles.colors} role="group" aria-label={de ? "Vorhandene Textfarbe im Apple-Mail-Entwurf" : "Existing text color in the Apple Mail draft"}>
               {(Object.keys(demoColors) as DemoColor[]).map(name => (
-                <button key={name} type="button" className={styles.colorButton} aria-label={name} aria-pressed={color === name} aria-controls="hero-mail-preview" onClick={() => changeStyle(undefined, name)}>
+                <button key={name} type="button" className={styles.colorButton} aria-label={colorLabels[name]} aria-pressed={color === name} aria-controls="hero-mail-preview" onClick={() => changeStyle(undefined, name)}>
                   <span style={{ backgroundColor: demoColors[name] }}>{color === name ? <Check size={12} aria-hidden="true" /> : null}</span>
                 </button>
               ))}
             </div>
           </div>
           <div id="hero-mail-preview" className={styles.mailBody} style={{ fontFamily: demoFonts[font], color: demoColors[color] }}>
-            <p>Hallo Alex,</p>
+            <p>{de ? "Hallo Alex," : "Hi Alex,"}</p>
             <div className={styles.insertSlot}>
-              <div className={styles.insertHint} aria-hidden={demo.formatted} style={{ opacity: demo.formatted ? 0 : 1 }}><i aria-hidden="true" /><span>Hier wird eingefügt</span></div>
+              <div className={styles.insertHint} aria-hidden={demo.formatted} style={{ opacity: demo.formatted ? 0 : 1 }}><i aria-hidden="true" /><span>{de ? "Hier wird eingefügt" : "Paste goes here"}</span></div>
               <div className={styles.inserted} aria-hidden={!demo.formatted}>
-                <motion.p {...lineMotion(0)}>Das Design ist <strong>fertig</strong>.</motion.p>
+                <motion.p {...lineMotion(0)}>{de ? "Das Design ist " : "The design is "}<strong>{de ? "fertig" : "ready"}</strong>.</motion.p>
                 <ul>
-                  <motion.li {...lineMotion(1)}>Feedback sammeln</motion.li>
-                  <motion.li {...lineMotion(2)}>Montag starten</motion.li>
+                  <motion.li {...lineMotion(1)}>{de ? "Feedback sammeln" : "Gather feedback"}</motion.li>
+                  <motion.li {...lineMotion(2)}>{de ? "Montag starten" : "Launch on Monday"}</motion.li>
                 </ul>
               </div>
             </div>
-            <p>Liebe Grüße<br />Sam</p>
+            <p>{de ? "Liebe Grüße" : "Best,"}<br />Sam</p>
           </div>
           <div className={styles.mailFooter}>
             <span role="status" className={styles.status}>
               {complete ? <Check size={13} aria-hidden="true" /> : <span className={styles.statusDot} aria-hidden="true" />}
-              {complete ? "Mail-Stil übernommen" : demo.phase === "paste" || demo.phase === "reveal" ? "Wird eingefügt …" : demo.phase === "copied" ? "Markdown kopiert" : "Dein bestehender Entwurf"}
+              {complete ? (de ? "Mail-Stil übernommen" : "Mail style preserved") : demo.phase === "paste" || demo.phase === "reveal" ? (de ? "Wird eingefügt …" : "Pasting …") : demo.phase === "copied" ? (de ? "Markdown kopiert" : "Markdown copied") : (de ? "Dein bestehender Entwurf" : "Your existing draft")}
             </span>
-            <span className={styles.styleValue}>{font} · 16 · {color}</span>
+            <span className={styles.styleValue}>{font} · 16 · {colorLabels[color]}</span>
           </div>
         </motion.div>
       </div>
       <div className={styles.sceneFooter}>
-        <button type="button" className={styles.replay} onClick={play}><RotateCcw size={13} aria-hidden="true" /> Ablauf wiederholen</button>
-        <span>Browser-Demo ohne Zugriff auf Mail oder Zwischenablage.</span>
+        <button type="button" className={styles.replay} onClick={play}><RotateCcw size={13} aria-hidden="true" /> {de ? "Ablauf wiederholen" : "Replay workflow"}</button>
+        <span>{de ? "Browser-Demo ohne Zugriff auf Mail oder Zwischenablage." : "Browser demo. No access to Mail or your clipboard."}</span>
       </div>
     </div>
   );

@@ -9,12 +9,14 @@ import {
 import { RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./app-icon-scene.module.css";
+import { useLocale } from "./locale-provider";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const incomingRest = { x: "0%", y: "0%", rotate: -4, scale: 1, opacity: 1 };
 const outgoingRest = { x: "0%", y: "0%", rotate: 2, scale: 1, opacity: 1 };
 
 export function AppIconScene() {
+  const de = useLocale() === "de";
   const stage = useRef<HTMLDivElement>(null);
   const hasPlayed = useRef(false);
   const playback = useRef(0);
@@ -137,7 +139,7 @@ export function AppIconScene() {
         >
           <span className={styles.paperLabel}>MARKDOWN</span>
           <code>**Hey Alex,**</code>
-          <code>*Fertig.*</code>
+          <code>{de ? "*Fertig.*" : "*Ready.*"}</code>
           <span className={styles.paperLine} />
         </motion.div>
         <div className={styles.iconAnchor}>
@@ -160,16 +162,16 @@ export function AppIconScene() {
         >
           <span className={styles.paperLabel}>MAIL</span>
           <strong>Hey Alex,</strong>
-          <em>Fertig.</em>
+          <em>{de ? "Fertig." : "Ready."}</em>
           <span className={styles.paperLine} />
         </motion.div>
       </div>
       <figcaption className={styles.caption}>
-        Markdown rein. <span>Mail mit Format.</span>
+        {de ? "Markdown rein." : "Markdown in."} <span>{de ? "Mail mit Format." : "Formatted mail out."}</span>
       </figcaption>
       <button type="button" className={styles.replay} onClick={replay}>
         <RotateCcw size={14} aria-hidden="true" />
-        Animation erneut abspielen
+        {de ? "Animation erneut abspielen" : "Replay animation"}
       </button>
     </figure>
   );

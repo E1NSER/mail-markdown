@@ -1,4 +1,7 @@
+"use client";
+
 import { Star } from "lucide-react";
+import { useLocale } from "./locale-provider";
 import { REPOSITORY_URL } from "@/lib/release-model";
 
 export function GitHubButton({
@@ -10,8 +13,10 @@ export function GitHubButton({
   stars?: number | null;
   showStars?: boolean;
 }) {
+  const locale = useLocale();
+  const de = locale === "de";
   const count =
-    stars === null ? null : new Intl.NumberFormat("de-AT").format(stars);
+    stars === null ? null : new Intl.NumberFormat(de ? "de-AT" : "en-US").format(stars);
   return (
     <a
       href={REPOSITORY_URL}
@@ -20,8 +25,8 @@ export function GitHubButton({
       rel="noreferrer"
       aria-label={
         showStars && count !== null
-          ? `GitHub-Repository · ${count} Sterne`
-          : "GitHub-Repository"
+          ? (de ? `GitHub-Repository · ${count} Sterne` : `GitHub repository · ${count} ${stars === 1 ? "star" : "stars"}`)
+          : de ? "GitHub-Repository" : "GitHub repository"
       }
     >
       <svg

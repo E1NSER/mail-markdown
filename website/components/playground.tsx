@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "./locale-provider";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 import { ArrowRight, Check, ChevronDown, RotateCcw } from "lucide-react";
 
-const examples = [
+const germanExamples = [
   {
     name: "Projektupdate",
     text: "Hallo Alex,\n\n**Ein kurzes Update** zu unserem Projekt.\n\n- Das Design ist *abgestimmt*.\n- Die nächsten Schritte stehen.\n- Der Kaffee ist auch schon fertig.\n\n> Weniger formatieren. Mehr sagen.\n\nLiebe Grüße\nSam",
@@ -21,18 +22,36 @@ const examples = [
     text: "Hallo Sam,\n\n**Danke für deinen Entwurf!**\n\nDas gefällt mir besonders:\n- Die *klare Typografie*\n- Die ruhigen Farben\n- Der Fokus aufs Wesentliche\n\n~~Noch ein Meeting?~~ Ein kurzes Feedback reicht.\n\n> Genau so fühlt sich gute Zusammenarbeit an.\n\nLiebe Grüße\nAlex",
   },
 ];
+const englishExamples = [
+  {
+    name: "Project update",
+    text: "Hi Alex,\n\n**A quick update** on our project.\n\n- The design is *approved*.\n- The next steps are clear.\n- The coffee is ready, too.\n\n> Less formatting. More to say.\n\nBest,\nSam",
+  },
+  {
+    name: "Invitation",
+    text: "# A little invitation\n\nHi everyone,\n\nlet’s celebrate the launch on **Friday at 6 pm**.\n\n1. Drop by\n2. Bring your favorite drink\n3. Enjoy the evening\n\nYou can find the meeting point [here](https://example.org).\n\n*We look forward to seeing you!*",
+  },
+  {
+    name: "Feedback",
+    text: "Hi Sam,\n\n**Thanks for your draft!**\n\nHere’s what I particularly like:\n- The *clear typography*\n- The calm colors\n- The focus on what matters\n\n~~Another meeting?~~ A quick note will do.\n\n> This is what good collaboration feels like.\n\nBest,\nAlex",
+  },
+];
+const examplesByLocale = { en: englishExamples, de: germanExamples };
 const fonts = [
   { name: "Helvetica", family: "Helvetica, Arial, sans-serif" },
   { name: "Georgia", family: "Georgia, serif" },
   { name: "Times", family: '"Times New Roman", serif' },
 ];
 const colors = [
-  { label: "Graphit", value: "#26313e" },
-  { label: "Mail-Blau", value: "#0065cf" },
-  { label: "Terrakotta", value: "#994331" },
+  { en: "Graphite", de: "Graphit", value: "#26313e" },
+  { en: "Mail blue", de: "Mail-Blau", value: "#0065cf" },
+  { en: "Terracotta", de: "Terrakotta", value: "#994331" },
 ];
 
 export function Playground() {
+  const locale = useLocale();
+  const de = locale === "de";
+  const examples = examplesByLocale[locale];
   const [text, setText] = useState(examples[0].text);
   const [active, setActive] = useState<number | null>(0);
   const [font, setFont] = useState(1);
@@ -45,7 +64,7 @@ export function Playground() {
         <div
           className="example-tabs"
           role="group"
-          aria-label="Markdown-Beispiel auswählen"
+          aria-label={de ? "Markdown-Beispiel auswählen" : "Choose a Markdown example"}
         >
           {examples.map((example, index) => (
             <button
@@ -70,17 +89,17 @@ export function Playground() {
             setColor(colors[0].value);
           }}
         >
-          <RotateCcw size={14} /> Zurücksetzen
+          <RotateCcw size={14} /> {de ? "Zurücksetzen" : "Reset"}
         </button>
       </div>
       <div className="playground-panels">
         <div className="editor-panel">
           <div className="panel-label">
             <span>
-              <span className="panel-number">01</span> Markdown aus der KI
+              <span className="panel-number">01</span> {de ? "Markdown aus der KI" : "Markdown from AI"}
             </span>
             <span className="editable-badge">
-              Hier schreiben
+              {de ? "Hier schreiben" : "Write here"}
               <svg
                 className="editor-hint-arrow"
                 width="70"
@@ -101,7 +120,7 @@ export function Playground() {
             </span>
           </div>
           <label className="sr-only" htmlFor="markdown-input">
-            Markdown aus der KI ausprobieren
+            {de ? "Markdown aus der KI ausprobieren" : "Try Markdown from AI"}
           </label>
           <textarea
             id="markdown-input"
@@ -115,7 +134,7 @@ export function Playground() {
             aria-describedby="demo-privacy"
           />
           <div className="editor-footer">
-            <span>**fett** &nbsp; *kursiv* &nbsp; - Liste</span>
+            <span>{de ? "**fett**   *kursiv*   - Liste" : "**bold**   *italic*   - List"}</span>
             <span>{text.length} / 6000</span>
           </div>
         </div>
@@ -125,7 +144,7 @@ export function Playground() {
         <div className="result-panel">
           <div className="panel-label">
             <span>
-              <span className="panel-number">02</span> Dein Apple-Mail-Stil
+              <span className="panel-number">02</span> {de ? "Dein Apple-Mail-Stil" : "Your Apple Mail style"}
             </span>
             <span className="live-badge">
               <span /> Live
@@ -133,7 +152,7 @@ export function Playground() {
           </div>
           <div className="style-controls">
             <label className="font-select">
-              <span className="sr-only">Schriftart der Vorschau</span>
+              <span className="sr-only">{de ? "Schriftart der Vorschau" : "Preview font"}</span>
               <select
                 value={font}
                 onChange={(event) => setFont(Number(event.target.value))}
@@ -150,13 +169,13 @@ export function Playground() {
             <div
               className="color-controls"
               role="group"
-              aria-label="Textfarbe der Vorschau"
+              aria-label={de ? "Textfarbe der Vorschau" : "Preview text color"}
             >
               {colors.map((item) => (
                 <button
                   key={item.value}
                   className="color-option"
-                  aria-label={item.label}
+                  aria-label={item[locale]}
                   aria-pressed={color === item.value}
                   onClick={() => setColor(item.value)}
                 >
@@ -189,7 +208,7 @@ export function Playground() {
                   img: (props) => <span>{props.alt}</span>,
                 }}
               >
-                {text || "Dein formatierter Text erscheint hier."}
+                {text || (de ? "Dein formatierter Text erscheint hier." : "Your formatted text appears here.")}
               </Markdown>
             </motion.div>
           </AnimatePresence>
@@ -197,12 +216,10 @@ export function Playground() {
       </div>
       <div className="playground-caption" id="demo-privacy">
         <span>
-          <span className="privacy-dot" /> Diese Browser-Demo verarbeitet deinen
-          Text nur auf deinem Gerät.
+          <span className="privacy-dot" /> {de ? "Diese Browser-Demo verarbeitet deinen Text nur auf deinem Gerät." : "This browser demo processes your text only on your device."}
         </span>
         <span>
-          Die installierte Erweiterung übernimmt den Stil deines
-          Apple-Mail-Entwurfs.
+          {de ? "Die installierte Erweiterung übernimmt den Stil deines Apple-Mail-Entwurfs." : "The installed extension uses the style of your Apple Mail draft."}
         </span>
       </div>
     </div>

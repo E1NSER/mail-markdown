@@ -11,7 +11,13 @@ export const DENIED_CONSENT = Object.freeze({
 const STATISTICS_CONSENT = Object.freeze({ ...DENIED_CONSENT, analytics_storage: "granted" });
 export const ANALYTICS_COOKIE_PREFIX = "mm";
 const PAGES: Record<string, string> = {
-  "/": "Mail Markdown — Markdown-Erweiterung für Apple Mail",
+  "/": "Mail Markdown — Markdown for Apple Mail",
+  "/en": "Mail Markdown — Markdown for Apple Mail",
+  "/de": "Mail Markdown — Markdown-Erweiterung für Apple Mail",
+  "/en/privacy": "Privacy · Mail Markdown",
+  "/de/privacy": "Datenschutz · Mail Markdown",
+  "/en/legal-notice": "Legal notice · Mail Markdown",
+  "/de/legal-notice": "Impressum · Mail Markdown",
   "/datenschutz": "Datenschutz · Mail Markdown",
   "/impressum": "Impressum · Mail Markdown",
 };

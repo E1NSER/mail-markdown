@@ -8,6 +8,35 @@ import { X } from "lucide-react";
 import { CONSENT_STORAGE_KEY, createConsentChoice, parseConsentChoice, persistConsentChoice, type ConsentChoice } from "@/lib/consent";
 import { createAnalyticsController, ownAnalyticsCookieRemovals, validMeasurementId, type AnalyticsController } from "@/lib/analytics";
 import styles from "./consent-provider.module.css";
+import { useLocale } from "./locale-provider";
+import { localePath } from "@/lib/i18n";
+
+const consentCopy = {
+  en: {
+    settings: "Cookie settings", eyebrow: "YOUR CHOICE", title: "Allow usage statistics?",
+    banner: "With your permission, Google Analytics helps us understand page views and clicks on the app download. Your Markdown input is never included. Statistics stay off unless you agree. You can withdraw consent at any time through Cookie settings in the footer.",
+    privacy: "More about privacy", allow: "Allow statistics", necessaryOnly: "Necessary only", preferences: "Settings",
+    close: "Close cookie settings", privacyTitle: "Your privacy.",
+    description: "You choose whether we use optional statistics. You can change or withdraw your consent here at any time.",
+    noAnalytics: "This website currently uses only necessary storage for your preferences. Optional statistics are not active.",
+    necessary: "Necessary", alwaysActive: "Always active", storage: "Saves your privacy choice for up to 180 days on this device.",
+    statistics: "Statistics", analytics: "Google Analytics helps us understand page views and clicks on the app download. No advertising and no contents of your Markdown input.",
+    details: "Privacy details", save: "Save preferences", understood: "Got it",
+    enabled: "Statistics are enabled.", disabled: "Only necessary storage is active. Statistics are disabled.",
+  },
+  de: {
+    settings: "Cookie-Einstellungen", eyebrow: "DEINE ENTSCHEIDUNG", title: "Ein bisschen Statistik?",
+    banner: "Mit deiner Erlaubnis hilft uns Google Analytics, Seitenaufrufe und Klicks auf den App-Download auszuwerten. Deine Markdown-Eingaben bleiben außen vor. Ohne Zustimmung bleibt Statistik aus. Jederzeit über die Cookie-Einstellungen im Footer widerrufbar.",
+    privacy: "Mehr zum Datenschutz", allow: "Statistik erlauben", necessaryOnly: "Nur notwendige", preferences: "Einstellungen",
+    close: "Cookie-Einstellungen schließen", privacyTitle: "Deine Privatsphäre.",
+    description: "Du bestimmst, ob wir optionale Statistik verwenden. Du kannst deine Einwilligung hier jederzeit ändern oder widerrufen.",
+    noAnalytics: "Diese Website verwendet derzeit nur notwendigen Speicher für deine Einstellungen. Optionale Statistik ist nicht aktiv.",
+    necessary: "Notwendig", alwaysActive: "Immer aktiv", storage: "Speichert deine Datenschutz-Auswahl für bis zu 180 Tage auf diesem Gerät.",
+    statistics: "Statistik", analytics: "Google Analytics hilft uns, Seitenaufrufe und Klicks auf den App-Download zu verstehen. Keine Werbung und keine Inhalte deiner Markdown-Eingabe.",
+    details: "Details zum Datenschutz", save: "Auswahl speichern", understood: "Verstanden",
+    enabled: "Statistik ist eingeschaltet.", disabled: "Nur notwendiger Speicher ist aktiv. Statistik ist ausgeschaltet.",
+  },
+} as const;
 
 type ConsentContextValue = {
   openSettings: () => void;
@@ -44,10 +73,14 @@ export function useConsent(): ConsentContextValue {
 
 export function CookieSettingsButton({ className }: { className?: string }) {
   const { openSettings } = useConsent();
-  return <button type="button" className={className ?? styles.settingsButton} onClick={openSettings}>Cookie-Einstellungen</button>;
+  const copy = consentCopy[useLocale()];
+  return <button type="button" className={className ?? styles.settingsButton} onClick={openSettings}>{copy.settings}</button>;
 }
 
 export function ConsentProvider({ children, measurementId }: { children: ReactNode; measurementId?: string }) {
+  const locale = useLocale();
+  const copy = consentCopy[locale];
+  const privacyHref = localePath(locale, "/privacy");
   const id = validMeasurementId(measurementId);
   const pathname = usePathname();
   const pathRef = useRef(pathname);
@@ -138,8 +171,8 @@ export function ConsentProvider({ children, measurementId }: { children: ReactNo
       storageAvailable.current = false;
     }
     setPreferencesOpen(false);
-    setAnnouncement(next.statistics ? "Statistik ist eingeschaltet." : "Nur notwendiger Speicher ist aktiv. Statistik ist ausgeschaltet.");
-  }, [id]);
+    setAnnouncement(next.statistics ? copy.enabled : copy.disabled);
+  }, [copy, id]);
 
   const openSettings = useCallback(() => {
     setDraftStatistics(Boolean(id) && Boolean(choice?.statistics));
@@ -169,42 +202,42 @@ export function ConsentProvider({ children, measurementId }: { children: ReactNo
       {ready && id && !choice ? (
         <aside className={styles.banner} aria-labelledby="cookie-banner-title">
           <div className={styles.bannerCopy}>
-            <span className={styles.eyebrow}>DEINE ENTSCHEIDUNG</span>
-            <h2 id="cookie-banner-title">Ein bisschen Statistik?</h2>
-            <p>Mit deiner Erlaubnis hilft uns Google Analytics, Seitenaufrufe und Klicks auf den App-Download auszuwerten. Deine Markdown-Eingaben bleiben außen vor. Ohne Zustimmung bleibt Statistik aus. Jederzeit über die Cookie-Einstellungen im Footer widerrufbar. <Link href="/datenschutz">Mehr zum Datenschutz</Link></p>
+            <span className={styles.eyebrow}>{copy.eyebrow}</span>
+            <h2 id="cookie-banner-title">{copy.title}</h2>
+            <p>{copy.banner} <Link href={privacyHref}>{copy.privacy}</Link></p>
           </div>
           <div className={styles.bannerActions}>
-            <button type="button" className={styles.choiceButton} onClick={() => saveChoice(true)}>Statistik erlauben</button>
-            <button type="button" className={styles.choiceButton} onClick={() => saveChoice(false)}>Nur notwendige</button>
-            <button type="button" className={styles.preferencesButton} onClick={openSettings}>Einstellungen</button>
+            <button type="button" className={styles.choiceButton} onClick={() => saveChoice(true)}>{copy.allow}</button>
+            <button type="button" className={styles.choiceButton} onClick={() => saveChoice(false)}>{copy.necessaryOnly}</button>
+            <button type="button" className={styles.preferencesButton} onClick={openSettings}>{copy.preferences}</button>
           </div>
         </aside>
       ) : null}
       <dialog ref={dialogRef} className={styles.dialog} aria-labelledby="cookie-settings-title" aria-describedby="cookie-settings-description" onCancel={() => setPreferencesOpen(false)} onClose={() => setPreferencesOpen(false)}>
         <div className={styles.dialogHeader}>
-          <span className={styles.eyebrow}>DEINE ENTSCHEIDUNG</span>
-          <button type="button" className={styles.closeButton} onClick={closeSettings} aria-label="Cookie-Einstellungen schließen"><X size={20} aria-hidden="true" /></button>
+          <span className={styles.eyebrow}>{copy.eyebrow}</span>
+          <button type="button" className={styles.closeButton} onClick={closeSettings} aria-label={copy.close}><X size={20} aria-hidden="true" /></button>
         </div>
-        <h2 id="cookie-settings-title">Deine Privatsphäre.</h2>
-        <p id="cookie-settings-description">{id ? "Du bestimmst, ob wir optionale Statistik verwenden. Du kannst deine Einwilligung hier jederzeit ändern oder widerrufen." : "Diese Website verwendet derzeit nur notwendigen Speicher für deine Einstellungen. Optionale Statistik ist nicht aktiv."}</p>
+        <h2 id="cookie-settings-title">{copy.privacyTitle}</h2>
+        <p id="cookie-settings-description">{id ? copy.description : copy.noAnalytics}</p>
         <div className={styles.category}>
-          <div className={styles.categoryTitle}><h3>Notwendig</h3><span className={styles.alwaysActive}>Immer aktiv</span></div>
-          <p>Speichert deine Datenschutz-Auswahl für bis zu 180 Tage auf diesem Gerät.</p>
+          <div className={styles.categoryTitle}><h3>{copy.necessary}</h3><span className={styles.alwaysActive}>{copy.alwaysActive}</span></div>
+          <p>{copy.storage}</p>
         </div>
         {id ? (
           <label className={styles.category}>
-            <span className={styles.categoryTitle}><span className={styles.categoryName}>Statistik</span><input type="checkbox" checked={draftStatistics} onChange={(event) => setDraftStatistics(event.target.checked)} /></span>
-            <span className={styles.categoryDescription}>Google Analytics hilft uns, Seitenaufrufe und Klicks auf den App-Download zu verstehen. Keine Werbung und keine Inhalte deiner Markdown-Eingabe. <Link href="/datenschutz" onClick={closeSettings}>Details zum Datenschutz</Link></span>
+            <span className={styles.categoryTitle}><span className={styles.categoryName}>{copy.statistics}</span><input type="checkbox" checked={draftStatistics} onChange={(event) => setDraftStatistics(event.target.checked)} /></span>
+            <span className={styles.categoryDescription}>{copy.analytics} <Link href={privacyHref} onClick={closeSettings}>{copy.details}</Link></span>
           </label>
         ) : null}
         <div className={styles.dialogActions}>
           {id ? <>
             <div className={styles.equalChoices}>
-              <button type="button" className={styles.choiceButton} onClick={() => saveChoice(true)}>Statistik erlauben</button>
-              <button type="button" className={styles.choiceButton} onClick={() => saveChoice(false)}>Nur notwendige</button>
+              <button type="button" className={styles.choiceButton} onClick={() => saveChoice(true)}>{copy.allow}</button>
+              <button type="button" className={styles.choiceButton} onClick={() => saveChoice(false)}>{copy.necessaryOnly}</button>
             </div>
-            <button type="button" className={styles.saveButton} onClick={() => saveChoice(draftStatistics)}>Auswahl speichern</button>
-          </> : <button type="button" className={styles.choiceButton} onClick={() => saveChoice(false)}>Verstanden</button>}
+            <button type="button" className={styles.saveButton} onClick={() => saveChoice(draftStatistics)}>{copy.save}</button>
+          </> : <button type="button" className={styles.choiceButton} onClick={() => saveChoice(false)}>{copy.understood}</button>}
         </div>
       </dialog>
       <span className={styles.srOnly} role="status">{announcement}</span>

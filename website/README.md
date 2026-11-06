@@ -79,3 +79,9 @@ The visual identity uses the app icon's blue (`#1375DB`) as a continuous brand s
 These are layout and interaction references. The palette, copy, artwork and Markdown-to-Mail interaction are specific to this project; no reference assets are included.
 
 Created by [E1NSER.](https://einser.at). Project code is covered by the repository's [MIT License](../LICENSE).
+
+## Languages
+
+English is the default: `/` redirects to `/en`. German is available at `/de`; desktop navigation and the mobile menu offer an explicit language switch. Privacy and legal-notice pages are available under each language, with equivalent-page switches. The previous `/datenschutz` and `/impressum` URLs redirect to their German equivalents.
+
+The locale is server-rendered in the HTML language, content, metadata, canonical and alternate-language links. Interactive examples, animation controls, accessibility labels and consent dialogs use the same locale. Changing language does not change the stored consent choice. Analytics accepts only the explicitly allowlisted public language routes and continues to discard query strings and fragments.

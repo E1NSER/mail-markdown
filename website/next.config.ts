@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
         destination: `${SITE_URL}/:path*`,
         permanent: true,
       },
+      { source: "/", destination: "/en", permanent: true },
+      { source: "/privacy", destination: "/en/privacy", permanent: true },
+      { source: "/legal-notice", destination: "/en/legal-notice", permanent: true },
+      { source: "/datenschutz", destination: "/de/privacy", permanent: true },
+      { source: "/impressum", destination: "/de/legal-notice", permanent: true },
     ];
   },
   async headers() {
