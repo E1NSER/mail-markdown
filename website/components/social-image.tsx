@@ -63,7 +63,7 @@ export function socialImage(locale: Locale) {
           color: "#d7edff",
         }}
       >
-        <span>{de ? "Die Markdown-Erweiterung für Apple Mail." : "Markdown for Apple Mail."}</span>
+        <span>{de ? "Markdown für Apple Mail." : "Markdown for Apple Mail."}</span>
         <span>{de ? "Kostenlos. Lokal. Open Source." : "Free. Local. Open source."}</span>
       </div>
       <div

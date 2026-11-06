@@ -47,6 +47,9 @@ public struct MarkdownRenderer {
         if markdown.hasSuffix("\n"), !output.string.hasSuffix("\n") {
             output.append(attributed("\n", context: context))
         }
+        // Each paragraph uses the layout of its first character, as AppKit and RTF do:
+        // a line that starts with a list marker hangs it, every other line keeps the block indent.
+        output.fixParagraphStyleAttribute(in: NSRange(location: 0, length: output.length))
         return output
     }
 
@@ -58,6 +61,8 @@ public struct MarkdownRenderer {
         var code = false
         var listDepth = 0
         var quoteDepth = 0
+        /// Set only for a list item's marker, which hangs one level left of the item text.
+        var listMarker = false
     }
 
     private func attributes(_ context: Context) -> [NSAttributedString.Key: Any] {
@@ -68,10 +73,16 @@ public struct MarkdownRenderer {
         if context.italic { font = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask) }
         let paragraph = context.style.paragraphStyle.mutableCopy() as! NSMutableParagraphStyle
         if context.listDepth > 0 || context.quoteDepth > 0 {
-            let indent = font.pointSize * 1.8 * CGFloat(context.listDepth + context.quoteDepth)
-            paragraph.firstLineHeadIndent += max(0, indent - font.pointSize * 1.8)
+            // Every list and quote level indents by 1.8 em. Quotes and list continuation
+            // lines have no marker, so their first line starts at the same indent.
+            let level = context.style.font.pointSize * 1.8
+            let indent = level * CGFloat(context.listDepth + context.quoteDepth)
+            paragraph.firstLineHeadIndent += context.listMarker ? indent - level : indent
             paragraph.headIndent += indent
-            paragraph.tabStops = [NSTextTab(textAlignment: .left, location: paragraph.headIndent)]
+            if context.listDepth > 0 {
+                // The tab after a list marker moves the item text to the indent.
+                paragraph.tabStops = [NSTextTab(textAlignment: .left, location: paragraph.headIndent)]
+            }
         }
         var result: [NSAttributedString.Key: Any] = [
             .font: font,
@@ -194,7 +205,9 @@ public struct MarkdownRenderer {
             } else {
                 prefix = "•\t"
             }
-            output.append(attributed(prefix, context: child))
+            var marker = child
+            marker.listMarker = true
+            output.append(attributed(prefix, context: marker))
             output.append(renderBlocks(node.children, context: child, separator: "\n"))
         }
         return output

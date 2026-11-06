@@ -1,8 +1,8 @@
 # Mail Markdown website
 
-German landing page for [Mail Markdown](https://github.com/E1NSER/mail-markdown), a free macOS companion for Apple Mail. Built with Next.js 16.4.5, React 19, TypeScript and Motion 14.9.1.
+English and German landing page for [Mail Markdown](https://github.com/E1NSER/mail-markdown), a free macOS companion app for Apple Mail. Built with Next.js 16.4.5, React 19, TypeScript and Motion 14.9.1.
 
-The page positions the product as a Markdown extension for the existing Apple Mail workflow: copy Markdown source from an AI chat, paste with ⌘V into an existing draft, and use that draft's font, size and color. The native product runs as a separate menu-bar app, rather than a MailKit plug-in. Claims about discarding source backgrounds apply to a recognized Markdown conversion with a readable draft style; it is not a general rich-text cleaner.
+The page positions the product as a companion app for the existing Apple Mail workflow: copy Markdown source from an AI chat, paste with ⌘V into an existing draft, and use that draft's font, size and color. The native product runs as a separate menu-bar app, rather than a MailKit plug-in, so copy calls it a companion app (German: Begleit-App), never an extension or Erweiterung. Claims about discarding source backgrounds apply to a recognized Markdown conversion with a readable draft style; it is not a general rich-text cleaner.
 
 Production: [markdown-mail.einser.at](https://markdown-mail.einser.at). The old public [Vercel URL](https://mail-markdown.vercel.app) permanently redirects to the custom domain, preserving the path and query. Preview deployments, localhost and the custom domain are unaffected. Canonical metadata and analytics use the custom domain.
 
@@ -32,6 +32,8 @@ npm run build
 ## Demo and privacy
 
 The editable playground renders Markdown in the browser with `react-markdown`, `remark-gfm` and `remark-breaks`. Sample, font and color controls illustrate how formatting inherits a draft's style. The browser demo does not connect to Apple Mail; the native app uses its own Swift parser and RTF output.
+
+The preview follows `Sources/MailMarkdownCore/MarkdownRenderer.swift` where HTML allows it: every heading at text size, same-size code, 1.8 em list and quote indents without a quote bar, ☑/☐ task markers, a `────────` rule, tab-separated tables and single newlines as line breaks. Raw HTML stays literal text. The components live in `lib/mail-preview.ts` and the layout rules in `.rendered-markdown` in `app/globals.css`; change them together with the renderer. Line height and tab widths remain browser approximations, which the caption states.
 
 User-entered text stays in client state. There is no text-processing API or account system. Optional GA4 statistics load only after explicit analytics consent and a valid measurement ID is configured. Markdown, clipboard contents and editor interactions are never included in analytics events. Ordinary hosting requests and optional statistics are covered by the site's [privacy page](app/datenschutz/page.tsx).
 
