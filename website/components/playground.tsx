@@ -4,9 +4,8 @@ import { useState } from "react";
 import { useLocale } from "./locale-provider";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkBreaks from "remark-breaks";
 import { ArrowRight, Check, ChevronDown, RotateCcw } from "lucide-react";
+import { previewComponents, previewRemarkPlugins } from "@/lib/mail-preview";
 
 const germanExamples = [
   {
@@ -197,17 +196,7 @@ export function Playground() {
               className="rendered-markdown"
               style={{ fontFamily: fonts[font].family, color }}
             >
-              <Markdown
-              remarkPlugins={[remarkGfm, remarkBreaks]}
-                components={{
-                  a: (props) => (
-                    <a href={props.href} target="_blank" rel="noreferrer">
-                      {props.children}
-                    </a>
-                  ),
-                  img: (props) => <span>{props.alt}</span>,
-                }}
-              >
+              <Markdown remarkPlugins={previewRemarkPlugins} components={previewComponents}>
                 {text || (de ? "Dein formatierter Text erscheint hier." : "Your formatted text appears here.")}
               </Markdown>
             </motion.div>
@@ -219,7 +208,7 @@ export function Playground() {
           <span className="privacy-dot" /> {de ? "Diese Browser-Demo verarbeitet deinen Text nur auf deinem Gerät." : "This browser demo processes your text only on your device."}
         </span>
         <span>
-          {de ? "Die installierte Erweiterung übernimmt den Stil deines Apple-Mail-Entwurfs." : "The installed extension uses the style of your Apple Mail draft."}
+          {de ? "Browser-Vorschau, angelehnt an das Ergebnis der App. In Apple Mail übernimmt die Begleit-App den Stil deines Entwurfs." : "Browser preview modeled on the app’s output. In Apple Mail, the companion app uses your draft’s style."}
         </span>
       </div>
     </div>

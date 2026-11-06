@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { defaultLocale, isLocale, localePath } from "../lib/i18n.ts";
+import { defaultLocale, isLocale, localePath, siteDescriptions, siteTitles } from "../lib/i18n.ts";
 import { pageContext } from "../lib/analytics.ts";
+
+test("site metadata calls the product a companion app, never an extension", () => {
+  for (const text of [...Object.values(siteTitles), ...Object.values(siteDescriptions)]) {
+    assert.doesNotMatch(text, /erweiterung|extension/i);
+  }
+  assert.match(siteDescriptions.en, /companion app/);
+  assert.match(siteDescriptions.de, /Begleit-App/);
+  assert.equal(pageContext("/en")?.page_title, siteTitles.en);
+  assert.equal(pageContext("/de")?.page_title, siteTitles.de);
+});
 
 test("English is the default and only explicit English/German locales are supported", () => {
   assert.equal(defaultLocale, "en");

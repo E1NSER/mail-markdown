@@ -63,6 +63,114 @@ final class MarkdownRendererTests: XCTestCase {
         XCTAssertGreaterThan(nestedParagraph.headIndent, 17 * 1.8)
     }
 
+    /// One indentation level: 1.8 em of the 17 pt test font.
+    private let level: CGFloat = 17 * 1.8
+
+    /// Returns the indents of the paragraph containing `needle` and checks that the
+    /// whole paragraph shares one paragraph style, as AppKit and RTF lay it out.
+    @MainActor
+    private func indents(ofParagraphContaining needle: String, in result: NSAttributedString, file: StaticString = #filePath, line: UInt = #line) -> (first: CGFloat, head: CGFloat) {
+        let string = result.string as NSString
+        let match = string.range(of: needle)
+        guard match.location != NSNotFound else {
+            XCTFail("Missing \(needle)", file: file, line: line)
+            return (-1, -1)
+        }
+        let paragraph = string.paragraphRange(for: match)
+        let style = result.attribute(.paragraphStyle, at: paragraph.location, effectiveRange: nil) as! NSParagraphStyle
+        result.enumerateAttribute(.paragraphStyle, in: paragraph) { value, _, _ in
+            let run = value as! NSParagraphStyle
+            XCTAssertEqual(run.firstLineHeadIndent, style.firstLineHeadIndent, "Mixed first-line indent in \(needle)", file: file, line: line)
+            XCTAssertEqual(run.headIndent, style.headIndent, "Mixed head indent in \(needle)", file: file, line: line)
+        }
+        return (style.firstLineHeadIndent, style.headIndent)
+    }
+
+    @MainActor
+    func testOneLineQuoteIndentsItsFirstLine() async {
+        let result = MarkdownRenderer().render("> Danke für das Feedback!", style: draftStyle())
+        XCTAssertEqual(result.string, "Danke für das Feedback!")
+        let quote = indents(ofParagraphContaining: "Danke", in: result)
+        XCTAssertEqual(quote.first, level, accuracy: 0.01)
+        XCTAssertEqual(quote.head, level, accuracy: 0.01)
+    }
+
+    @MainActor
+    func testEveryQuoteLineIsIndentedPerNestingLevel() async {
+        let result = MarkdownRenderer().render("Davor\n\n> Zeile eins\n> Zeile zwei\n>\n> > Tiefer\n\nDanach", style: draftStyle())
+        XCTAssertEqual(result.string, "Davor\n\nZeile eins\nZeile zwei\n\nTiefer\n\nDanach")
+        for line in ["Zeile eins", "Zeile zwei"] {
+            let quote = indents(ofParagraphContaining: line, in: result)
+            XCTAssertEqual(quote.first, level, accuracy: 0.01, line)
+            XCTAssertEqual(quote.head, level, accuracy: 0.01, line)
+        }
+        let nested = indents(ofParagraphContaining: "Tiefer", in: result)
+        XCTAssertEqual(nested.first, 2 * level, accuracy: 0.01)
+        XCTAssertEqual(nested.head, 2 * level, accuracy: 0.01)
+        for text in ["Davor", "Danach"] {
+            let plain = indents(ofParagraphContaining: text, in: result)
+            XCTAssertEqual(plain.first, 0, text)
+            XCTAssertEqual(plain.head, 0, text)
+        }
+    }
+
+    @MainActor
+    func testQuoteInsideListIsIndentedPastTheItemText() async {
+        let result = MarkdownRenderer().render("- Punkt\n  > Zitat\n- Nächster", style: draftStyle())
+        XCTAssertEqual(result.string, "•\tPunkt\nZitat\n•\tNächster")
+        let item = indents(ofParagraphContaining: "Punkt", in: result)
+        XCTAssertEqual(item.first, 0)
+        XCTAssertEqual(item.head, level, accuracy: 0.01)
+        let quote = indents(ofParagraphContaining: "Zitat", in: result)
+        XCTAssertEqual(quote.first, 2 * level, accuracy: 0.01)
+        XCTAssertEqual(quote.head, 2 * level, accuracy: 0.01)
+    }
+
+    @MainActor
+    func testListInsideQuoteHangsItsMarkerAtTheQuoteIndent() async {
+        let result = MarkdownRenderer().render("> - Punkt", style: draftStyle())
+        XCTAssertEqual(result.string, "•\tPunkt")
+        let item = indents(ofParagraphContaining: "Punkt", in: result)
+        XCTAssertEqual(item.first, level, accuracy: 0.01)
+        XCTAssertEqual(item.head, 2 * level, accuracy: 0.01)
+    }
+
+    @MainActor
+    func testListContinuationLinesAlignWithTheItemText() async {
+        let result = MarkdownRenderer().render("- Zeile eins\n  Zeile zwei\n\n1. Schritt\n\n   Erklärung", style: draftStyle())
+        XCTAssertEqual(result.string, "•\tZeile eins\nZeile zwei\n\n1.\tSchritt\nErklärung")
+        for marker in ["Zeile eins", "Schritt"] {
+            let item = indents(ofParagraphContaining: marker, in: result)
+            XCTAssertEqual(item.first, 0, marker)
+            XCTAssertEqual(item.head, level, accuracy: 0.01, marker)
+        }
+        for continuation in ["Zeile zwei", "Erklärung"] {
+            let line = indents(ofParagraphContaining: continuation, in: result)
+            XCTAssertEqual(line.first, level, accuracy: 0.01, continuation)
+            XCTAssertEqual(line.head, level, accuracy: 0.01, continuation)
+        }
+    }
+
+    @MainActor
+    func testRTFRoundTripKeepsQuoteAndListIndents() async throws {
+        let rendered = MarkdownRenderer().render("> Zitat\n\n- Punkt\n  Weiter\n\nText", style: draftStyle())
+        let data = try rendered.data(from: NSRange(location: 0, length: rendered.length), documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])
+        let imported = try NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil)
+        XCTAssertEqual(imported.string, "Zitat\n\n•\tPunkt\nWeiter\n\nText")
+        let quote = indents(ofParagraphContaining: "Zitat", in: imported)
+        XCTAssertEqual(quote.first, level, accuracy: 0.5)
+        XCTAssertEqual(quote.head, level, accuracy: 0.5)
+        let item = indents(ofParagraphContaining: "Punkt", in: imported)
+        XCTAssertEqual(item.first, 0, accuracy: 0.5)
+        XCTAssertEqual(item.head, level, accuracy: 0.5)
+        let continuation = indents(ofParagraphContaining: "Weiter", in: imported)
+        XCTAssertEqual(continuation.first, level, accuracy: 0.5)
+        XCTAssertEqual(continuation.head, level, accuracy: 0.5)
+        let text = indents(ofParagraphContaining: "Text", in: imported)
+        XCTAssertEqual(text.first, 0, accuracy: 0.5)
+        XCTAssertEqual(text.head, 0, accuracy: 0.5)
+    }
+
     @MainActor
     func testSoftBreaksBlankParagraphsAndTrailingNewline() async {
         let result = MarkdownRenderer().render("Zeile eins\nZeile **zwei**\n\nAbsatz\n", style: draftStyle())
