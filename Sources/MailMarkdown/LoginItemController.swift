@@ -23,15 +23,15 @@ final class LoginItemController {
     var statusDescription: String {
         switch status {
         case .enabled:
-            return "Mail Markdown startet bei der Anmeldung."
+            return L("Mail Markdown opens at login.")
         case .requiresApproval:
-            return "Erlaube den automatischen Start noch in den Systemeinstellungen."
+            return L("Allow launch at login in System Settings.")
         case .notRegistered:
-            return "Der automatische Start ist ausgeschaltet."
+            return L("Launch at login is off.")
         case .notFound:
-            return "Lege die App für den Autostart im Ordner Programme ab."
+            return L("Launch at login is not registered yet.")
         @unknown default:
-            return "Der Status des automatischen Starts ist unbekannt."
+            return L("The launch-at-login status is unknown.")
         }
     }
 

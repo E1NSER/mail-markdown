@@ -67,3 +67,7 @@ Zuerst mit `gh release create --draft` einen Entwurf samt fertigem DMG anlegen, 
 Der Website-Download zeigt auf [GitHubs festes Latest-Asset](https://github.com/E1NSER/mail-markdown/releases/latest/download/Mail-Markdown-universal-notarized.dmg). GitHub bestimmt beim Abruf den aktuellen stabilen Release; die Website muss dafür nicht neu veröffentlicht werden. Ihre Verfügbarkeits- und Versionsanzeige kann bis zu fünf Minuten verzögert sein. Ohne passenden öffentlichen Release zeigt sie einen ehrlichen Verfügbarkeitshinweis.
 
 Apple beschreibt den Ablauf unter [Notarizing macOS software before distribution](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution) und [Customizing the notarization workflow](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
+
+## Sprachen prüfen
+
+Englisch ist die Standardsprache der App. `Resources/en.lproj/Localizable.strings` und `Resources/de.lproj/Localizable.strings` enthalten die vollständigen Sprachfassungen. Der App-Build kopiert beide Kataloge und prüft gleiche Schlüssel sowie kompatible Formatplatzhalter mit `scripts/validate-localizations.swift`. In der App kann die Sprache unter **General → System → Language** sofort gewechselt werden; produktive Builds speichern die Auswahl, die isolierte UI-Vorschau hält sie nur im Arbeitsspeicher.

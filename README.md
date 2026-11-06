@@ -8,10 +8,10 @@ Mail Markdown is an independent native macOS companion app by [E1NSER.](https://
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/mail-markdown-settings-dark.jpg">
-  <img src="docs/images/mail-markdown-settings-light.jpg" width="900" alt="Mail Markdown 1.1.0 settings with formatting, draft style, Accessibility and launch-at-login controls">
+  <img src="docs/images/mail-markdown-settings-light.jpg" width="900" alt="Mail Markdown 1.2.0 settings with formatting, draft style, Accessibility and launch-at-login controls">
 </picture>
 
-*Native macOS settings in light and dark appearance. Screenshots captured from the 1.1.0 UI preview with an example connection status.*
+*Native macOS settings in light and dark appearance. Screenshots captured from the 1.2.0 UI preview with an example connection status.*
 
 ## Current status
 
@@ -21,7 +21,7 @@ The fixed [latest installer link](https://github.com/E1NSER/mail-markdown/releas
 
 The current architecture targets direct distribution. It uses Accessibility to read the draft's text style and a keyboard event tap to handle paste. It is installed separately and does not appear in Mail's Extensions settings. See [Mac App Store feasibility](docs/APP_STORE_FEASIBILITY.md) for the sandbox constraints and a possible separate Services implementation.
 
-Version 1.1.0 implements the Mail Native design with a compact sidebar, native controls and automatic light/dark appearance.
+The Mail Native interface has a compact sidebar, native controls and automatic light/dark appearance. The upcoming **1.2.0** release adds English as the default and German under **General → System → Language**. Your selection is saved and applies immediately. This localization is available in source and local builds; the public installer remains **1.1.0** until the new notarization completes.
 
 ## Requirements
 
@@ -51,13 +51,13 @@ For Universal builds, packaging and public distribution, see the [build scripts 
 
 ## Set up and use
 
-1. Open Mail Markdown. In **System Settings → Privacy & Security → Accessibility**, enable the app. The German UI also provides **Bedienungshilfen öffnen …** to open this setting.
+1. Open Mail Markdown. In **System Settings → Privacy & Security → Accessibility**, enable the app. The app also provides **Open Accessibility …** (German: **Bedienungshilfen öffnen …**) to open this setting.
 2. In Apple Mail, open a **Rich Text** draft. Put the cursor beside existing text with the font, size and color you want to keep.
 3. Copy some Markdown and paste with **⌘V**. For example, `**bold** and *italic*` becomes formatted text in the draft's style.
 
 To convert Markdown already in a draft, select it, press **⌘C**, then **⌘V**.
 
-Closing the settings window leaves the menu-bar app running. Reopen it through **Einstellungen …** or by opening the app again. Launch at login is optional and off by default. The app's preview uses a neutral example style; it does not read an open Mail draft.
+Closing the settings window leaves the menu-bar app running. Reopen it through **Settings …** (German: **Einstellungen …**) or by opening the app again. Launch at login is optional and off by default. The app's preview uses a neutral example style; it does not read an open Mail draft.
 
 ## Formatting and limits
 
@@ -75,7 +75,7 @@ If an update leaves Accessibility permission apparently enabled but the app repo
 
 Message and clipboard contents are processed on your Mac, without telemetry or a backend. Clipboard recovery temporarily retains the original in memory; conversion replaces the general clipboard until you restore it or copy something new. The app does not write message or clipboard contents to files or upload them. Operational logs contain status, Accessibility roles and process IDs, not message text. See [PRIVACY.md](PRIVACY.md).
 
-The separate [website](https://markdown-mail.einser.at) offers optional, consent-gated statistics; its [privacy notice](https://markdown-mail.einser.at/datenschutz) describes that processing. Website analytics are not part of the native app.
+The separate [website](https://markdown-mail.einser.at) offers optional, consent-gated statistics; its [privacy notice](https://markdown-mail.einser.at/en/privacy) describes that processing. Website analytics are not part of the native app.
 
 ## Development and verification
 

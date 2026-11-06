@@ -27,12 +27,16 @@ bundle_identifier="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$ap
 [[ "$output" != "$app/"* ]] || mm_fail "Das DMG muss außerhalb des App-Bundles gespeichert werden."
 binary_architectures="$(lipo -archs "$app/Contents/MacOS/MailMarkdown")"
 architecture_label="Architekturen: $binary_architectures."
+architecture_label_en="Architectures: $binary_architectures."
 if [[ " $binary_architectures " == *" arm64 "* && " $binary_architectures " == *" x86_64 "* ]]; then
   architecture_label="Universal-Build für Apple Silicon und Intel."
+  architecture_label_en="Universal build for Apple Silicon and Intel."
 elif [[ "$binary_architectures" == "arm64" ]]; then
   architecture_label="Build für Apple Silicon."
+  architecture_label_en="Build for Apple Silicon."
 elif [[ "$binary_architectures" == "x86_64" ]]; then
   architecture_label="Build für Intel-Macs."
+  architecture_label_en="Build for Intel Macs."
 fi
 if [[ -n "${MAIL_MARKDOWN_SIGNING_IDENTITY:-}" ]]; then
   signing_identity="$(mm_resolve_identity "$MAIL_MARKDOWN_SIGNING_IDENTITY")"
@@ -42,11 +46,14 @@ fi
 signing_name="$(mm_identity_name "$signing_identity")"
 signing_options=(--timestamp=none)
 signature_label="Lokal mit Apple Development signiert; nicht für eine allgemeine Veröffentlichung notarisiert."
+signature_label_en="Signed locally with Apple Development; not notarized for public distribution."
 if [[ "$signing_name" == "Developer ID Application:"* ]]; then
   signing_options=(--timestamp)
   signature_label="Mit Developer ID signiert. Vor öffentlicher Weitergabe muss der Notarisierungsablauf erfolgreich abgeschlossen werden."
+  signature_label_en="Signed with Developer ID. Public distribution also requires successful Apple notarization."
 elif [[ "$signing_identity" == "-" ]]; then
   signature_label="Ad-hoc-Build. Für allgemeine Weitergabe nicht als vertrauenswürdige Veröffentlichung signiert oder notarisiert."
+  signature_label_en="Ad-hoc development build. Not signed or notarized as a trusted public release."
 fi
 output_parent="${output:h}"
 mkdir -p "$output_parent"
@@ -56,15 +63,42 @@ payload="$package_dir/payload"
 mkdir -p "$payload"
 ditto "$app" "$payload/Mail Markdown.app"
 ln -s /Applications "$payload/Applications"
-cat > "$payload/Installieren.txt" <<INSTALL
+cat > "$payload/Read Me.txt" <<INSTALL
 MAIL MARKDOWN $version
 
+ENGLISH
+INSTALLATION
+1. Quit any older running copy of Mail Markdown through its menu.
+2. Drag Mail Markdown.app into Applications, then open it from there.
+3. Allow Accessibility access in System Settings when needed.
+4. Open a Rich Text draft in Apple Mail and paste Markdown with ⌘V.
+
+English is the default interface language. Choose Deutsch under
+General → System → Language to use the app in German.
+Mail Markdown is a separate macOS menu-bar app, installed independently
+of Mail's Extensions settings. Text is processed locally; messages are
+never sent automatically.
+
+REQUIREMENTS
+macOS 13 or later. $architecture_label_en
+
+SIGNING AND DISTRIBUTION
+$signature_label_en
+
+UNINSTALL
+Quit the app and remove it from Applications. Remove its Accessibility
+permission in System Settings if it is no longer needed.
+
+DEUTSCH
 INSTALLATION
 1. Mail Markdown.app auf den Ordner Applications ziehen.
    Eine bereits laufende ältere Version zuvor über ihr Menü beenden.
 2. Mail Markdown aus dem Programme-Ordner öffnen.
 3. In der App die benötigte Freigabe für Bedienungshilfen erteilen.
 4. In Apple Mail einen Rich-Text-Entwurf öffnen und Markdown mit ⌘V einfügen.
+
+Englisch ist die Standardsprache. Unter General → System → Language
+kannst du Deutsch wählen; die App merkt sich deine Auswahl.
 
 Mail Markdown ist eine eigenständige macOS-App mit Menüleistensymbol.
 Sie wird nicht im Erweiterungen-Bereich von Apple Mail installiert.

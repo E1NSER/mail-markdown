@@ -21,6 +21,7 @@ struct AppActions {
     let setLaunchAtLogin: (Bool) -> Void
     let openLoginItems: () -> Void
     let restoreClipboard: () -> Void
+    let setLanguage: (AppLanguage) -> Void
 }
 
 @MainActor
@@ -35,20 +36,24 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
     private let statusDetail = NSTextField(wrappingLabelWithString: "")
     private let permissionDot = NativeStatusDot()
     private let permissionStatus = NSTextField(labelWithString: "")
-    private let permissionButton = NSButton(title: "Bedienungshilfen öffnen …", target: nil, action: nil)
+    private let permissionButton = NSButton(title: L("Open Accessibility Settings …"), target: nil, action: nil)
     private let permissionLabel = NSTextField(wrappingLabelWithString: "")
     private let permissionDetails = NSStackView()
     private let loginLabel = NSTextField(wrappingLabelWithString: "")
-    private let loginSettingsButton = NSButton(title: "Anmeldeobjekte öffnen …", target: nil, action: nil)
+    private let loginSettingsButton = NSButton(title: L("Open Login Items …"), target: nil, action: nil)
     private let loginDetails = NSStackView()
-    private let restoreButton = NSButton(title: "Original wiederherstellen", target: nil, action: nil)
+    private let restoreButton = NSButton(title: L("Restore original"), target: nil, action: nil)
     private let clipboardLabel = NSTextField(wrappingLabelWithString: "")
     private let versionLabel = NSTextField(labelWithString: "")
     private let sourceEditor = NSTextView()
     private let previewEditor = NSTextView()
+    private let languagePicker = NSPopUpButton(frame: .zero, pullsDown: false)
+    private let persistsWindowFrame: Bool
+    private var sampleSource = ""
 
     init(actions: AppActions, persistWindowFrame: Bool = true) {
         self.actions = actions
+        self.persistsWindowFrame = persistWindowFrame
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 638),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                               backing: .buffered, defer: false)
@@ -74,41 +79,60 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
 
     func showHelpPage() { selectPage(2); present() }
 
+    /// Replace view text without restarting the paste event tap or discarding
+    /// clipboard recovery. Custom preview text and the selected page survive.
+    func localizedReplacement() -> AppWindowController {
+        let frame = window?.frame
+        // Release the old window's autosave registration before creating its
+        // replacement; two windows cannot share an autosave name.
+        if persistsWindowFrame { window?.setFrameAutosaveName("") }
+        let replacement = AppWindowController(actions: actions, persistWindowFrame: persistsWindowFrame)
+        if let frame { replacement.window?.setFrame(frame, display: false) }
+        let selected = pages.selectedTabViewItem.map { pages.indexOfTabViewItem($0) } ?? 0
+        replacement.selectPage(selected)
+        if sourceEditor.string != sampleSource {
+            replacement.sourceEditor.string = sourceEditor.string
+            replacement.updatePreview()
+        }
+        return replacement
+    }
+
+
     func update(_ state: AppViewState) {
         enabledSwitch.state = state.enabled ? .on : .off
         loginSwitch.state = state.launchAtLogin ? .on : .off
         permissionDetails.isHidden = state.permissionGranted
-        permissionStatus.stringValue = state.permissionGranted ? "Freigegeben" : "Nicht freigegeben"
+        permissionStatus.stringValue = state.permissionGranted ? L("Allowed") : L("Not allowed")
         permissionStatus.textColor = state.permissionGranted ? NativePalette.success : .systemOrange
         permissionDot.color = state.permissionGranted ? NativePalette.success : .systemOrange
-        permissionLabel.stringValue = "Erlaube den Zugriff, damit Mail Markdown ⌘V in Apple Mail erkennen und den Textstil deines Entwurfs übernehmen kann."
+        permissionLabel.stringValue = L("Allow access so Mail Markdown can recognize ⌘V in Apple Mail and use the text style of your draft.")
         loginLabel.stringValue = state.loginStatus
         loginSettingsButton.isHidden = !state.loginNeedsApproval
-        let ordinaryLoginStates = ["Mail Markdown startet bei der Anmeldung.", "Der automatische Start ist ausgeschaltet."]
+        let ordinaryLoginStates = [L("Mail Markdown opens at login."), L("Launch at login is off.")]
         loginDetails.isHidden = !state.loginNeedsApproval && ordinaryLoginStates.contains(state.loginStatus)
         restoreButton.isEnabled = state.canRestoreClipboard
         clipboardLabel.stringValue = state.canRestoreClipboard
-            ? "Das Original bleibt verfügbar, solange du nichts Neues kopierst oder die App beendest."
-            : "Nach der nächsten Markdown-Umwandlung verfügbar."
-        versionLabel.stringValue = "Version \(state.version)"
+            ? L("The original stays available until you copy something new or quit the app.")
+            : L("Available after the next Markdown conversion.")
+        versionLabel.stringValue = L("Version %@", state.version)
         if !state.enabled {
             statusDot.color = NativePalette.secondary
             statusTitle.textColor = NativePalette.secondary
-            statusTitle.stringValue = "Pausiert"
+            statusTitle.stringValue = L("Paused")
         } else if !state.permissionGranted {
             statusDot.color = .systemOrange
             statusTitle.textColor = .systemOrange
-            statusTitle.stringValue = "Freigabe erforderlich"
+            statusTitle.stringValue = L("Permission required")
         } else if state.ready {
             statusDot.color = NativePalette.success
             statusTitle.textColor = NativePalette.success
-            statusTitle.stringValue = "Bereit für Apple Mail"
+            statusTitle.stringValue = L("Ready for Apple Mail")
         } else {
             statusDot.color = .systemOrange
             statusTitle.textColor = .systemOrange
-            statusTitle.stringValue = "Verbindung wird geprüft"
+            statusTitle.stringValue = L("Checking connection")
         }
-        let ordinaryStatus = ["", "Bereit für Apple Mail", "Pausiert", "Bedienungshilfen erforderlich", "Wird gestartet …", "Markdown bereitgestellt · Stil aus dem Entwurf"]
+        let ordinaryStatus = ["", L("Ready for Apple Mail"), L("Paused"), L("Accessibility permission required"), L("Starting …"), L("Markdown ready · using draft style")]
         statusDetail.stringValue = state.status
         statusDetail.isHidden = ordinaryStatus.contains(state.status)
     }
@@ -156,9 +180,9 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
         name.lineBreakMode = .byTruncatingTail
         let brand = horizontal([icon, name], spacing: 10)
         let buttons = vertical([], spacing: 4)
-        for (index, entry) in [("Allgemein", "slider.horizontal.3"),
-                               ("Vorschau", "doc.richtext"),
-                               ("Hilfe", "questionmark.circle")].enumerated() {
+        for (index, entry) in [(L("General"), "slider.horizontal.3"),
+                               (L("Preview"), "doc.richtext"),
+                               (L("Help"), "questionmark.circle")].enumerated() {
             let button = NativeNavigationButton(title: entry.0, symbolName: entry.1)
             button.tag = index
             button.target = self
@@ -171,7 +195,7 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
         }
         versionLabel.font = .systemFont(ofSize: 12)
         versionLabel.textColor = NativePalette.subtle
-        let footer = vertical([body("Lokal auf deinem Mac.", size: 12), versionLabel], spacing: 4)
+        let footer = vertical([body(L("Local to your Mac."), size: 12), versionLabel], spacing: 4)
         for view in [brand, buttons, footer] { sidebar.addSubview(view) }
         NSLayoutConstraint.activate([
             brand.leadingAnchor.constraint(equalTo: sidebar.leadingAnchor, constant: 20),
@@ -199,20 +223,20 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
 
         enabledSwitch.target = self
         enabledSwitch.action = #selector(changeEnabled)
-        enabledSwitch.setAccessibilityLabel("Beim Einfügen formatieren")
+        enabledSwitch.setAccessibilityLabel(L("Format when pasting"))
         enabledSwitch.setAccessibilityIdentifier("formatting-enabled")
         let switchText = vertical([
-            label("Beim Einfügen formatieren", size: 13, weight: .medium),
-            body("Nur im Nachrichtentext von Apple Mail.", size: 12)
+            label(L("Format when pasting"), size: 13, weight: .medium),
+            body(L("Only in the message body of Apple Mail."), size: 12)
         ], spacing: 3)
         let keycap = NativeKeycapView()
-        let formatting = section("Formatierung", views: [
+        let formatting = section(L("Formatting"), views: [
             row(switchText, trailing: enabledSwitch, height: 52),
             separator(),
-            row(label("Tastenkürzel", size: 13, weight: .medium), trailing: keycap, height: 42),
+            row(label(L("Keyboard shortcut"), size: 13, weight: .medium), trailing: keycap, height: 42),
             separator(),
-            row(label("Schrift, Größe und Farbe", size: 13, weight: .medium),
-                trailing: body("Aus dem Mail-Entwurf", size: 12), height: 42)
+            row(label(L("Font, size and color"), size: 13, weight: .medium),
+                trailing: body(L("From your Mail draft"), size: 12), height: 42)
         ])
 
         permissionStatus.font = .systemFont(ofSize: 12)
@@ -226,7 +250,7 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
 
         loginSwitch.target = self
         loginSwitch.action = #selector(changeLogin)
-        loginSwitch.setAccessibilityLabel("Beim Anmelden starten")
+        loginSwitch.setAccessibilityLabel(L("Launch at login"))
         loginSwitch.setAccessibilityIdentifier("launch-at-login")
         loginLabel.font = .systemFont(ofSize: 12)
         loginLabel.textColor = NativePalette.secondary
@@ -234,22 +258,32 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
         loginSettingsButton.action = #selector(openLoginSettings)
         configureButton(loginSettingsButton)
         configureDetails(loginDetails, views: [loginLabel, loginSettingsButton])
-        let system = section("System", views: [
-            row(label("Bedienungshilfen", size: 13, weight: .medium), trailing: permissionBadge, height: 46),
+        languagePicker.addItems(withTitles: AppLanguage.allCases.map(\.displayName))
+        languagePicker.selectItem(at: AppLanguage.allCases.firstIndex(of: AppLanguage.current) ?? 0)
+        languagePicker.target = self
+        languagePicker.action = #selector(changeLanguage)
+        languagePicker.setAccessibilityLabel(L("Language"))
+        languagePicker.setAccessibilityIdentifier("interface-language")
+        languagePicker.translatesAutoresizingMaskIntoConstraints = false
+        languagePicker.widthAnchor.constraint(equalToConstant: 138).isActive = true
+        let system = section(L("System"), views: [
+            row(label(L("Language"), size: 13, weight: .medium), trailing: languagePicker, height: 42),
+            separator(),
+            row(label(L("Accessibility"), size: 13, weight: .medium), trailing: permissionBadge, height: 46),
             permissionDetails,
             separator(),
-            row(label("Beim Anmelden starten", size: 13, weight: .medium), trailing: loginSwitch, height: 46),
+            row(label(L("Launch at login"), size: 13, weight: .medium), trailing: loginSwitch, height: 46),
             loginDetails
         ])
 
         restoreButton.target = self
         restoreButton.action = #selector(restoreClipboard)
-        restoreButton.setAccessibilityLabel("Original-Zwischenablage wiederherstellen")
+        restoreButton.setAccessibilityLabel(L("Restore original clipboard"))
         configureButton(restoreButton)
         clipboardLabel.font = .systemFont(ofSize: 12)
         clipboardLabel.textColor = NativePalette.secondary
-        let clipboard = section("Zwischenablage", views: [restoreButton, clipboardLabel])
-        return scrollingPage(vertical([pageHeader("Allgemein", trailing: status), statusDetail, formatting, system, clipboard], spacing: 20))
+        let clipboard = section(L("Clipboard"), views: [restoreButton, clipboardLabel])
+        return scrollingPage(vertical([pageHeader(L("General"), trailing: status), statusDetail, formatting, system, clipboard], spacing: 20))
     }
 
     private func previewPage() -> NSView {
@@ -263,26 +297,27 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
         sourceEditor.isAutomaticSpellingCorrectionEnabled = false
         sourceEditor.allowsUndo = true
         sourceEditor.delegate = self
-        sourceEditor.setAccessibilityLabel("Markdown eingeben")
+        sourceEditor.setAccessibilityLabel(L("Enter Markdown"))
         sourceEditor.setAccessibilityIdentifier("markdown-source")
-        sourceEditor.string = "# Hallo!\n\n**Fett**, *kursiv* und [ein Link](https://example.com).\n\n- Erster Punkt\n- Zweiter Punkt\n\n> Ein kurzes Zitat."
+        sampleSource = L("# Hello!\n\n**Bold**, *italic* and [a link](https://example.com).\n\n- First item\n- Second item\n\n> A short quote.")
+        sourceEditor.string = sampleSource
         previewEditor.isEditable = false
         previewEditor.isSelectable = true
         previewEditor.backgroundColor = NativePalette.background
-        previewEditor.setAccessibilityLabel("Formatierte Vorschau")
+        previewEditor.setAccessibilityLabel(L("Formatted preview"))
         previewEditor.setAccessibilityIdentifier("markdown-preview")
         let editors = horizontal([
             vertical([sectionLabel("Markdown"), editorScroll(sourceEditor)], spacing: 8),
-            vertical([sectionLabel("Formatierte Vorschau"), editorScroll(previewEditor)], spacing: 8)
+            vertical([sectionLabel(L("Formatted preview")), editorScroll(previewEditor)], spacing: 8)
         ], spacing: 16)
         editors.distribution = .fillEqually
         editors.heightAnchor.constraint(equalToConstant: 380).isActive = true
         for column in editors.arrangedSubviews { column.heightAnchor.constraint(equalTo: editors.heightAnchor).isActive = true }
         let contents = vertical([
-            pageHeader("Vorschau"),
-            body("Probiere Markdown hier aus. In Apple Mail verwendet die App den Textstil an deiner Einfügestelle; diese Vorschau zeigt einen neutralen Beispielstil."),
+            pageHeader(L("Preview")),
+            body(L("Try Markdown here. In Apple Mail, the app uses the text style at your insertion point; this preview uses a neutral example style.")),
             editors,
-            body("Fett · Kursiv · Links · Listen · Überschriften · Zitate · Code", size: 12)
+            body(L("Bold · Italic · Links · Lists · Headings · Quotes · Code"), size: 12)
         ], spacing: 20)
         updatePreview()
         return scrollingPage(contents)
@@ -290,21 +325,21 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
 
     private func helpPage() -> NSView {
         let instructions = vertical([
-            instruction("1", "In Programme ablegen", "Ziehe Mail Markdown aus dem Installationsfenster in den Ordner Programme und öffne die App von dort."),
-            instruction("2", "Einmal freigeben", "Erlaube Mail Markdown unter Datenschutz & Sicherheit → Bedienungshilfen den Zugriff. Die App zeigt dir anschließend ihren Status an."),
-            instruction("3", "In Mail einfügen", "Öffne einen Rich-Text-Entwurf, setze den Cursor in bereits formatierten Text und füge Markdown mit ⌘V ein.")
+            instruction("1", L("Move to Applications"), L("Drag Mail Markdown from the installer window to Applications, then open it from there.")),
+            instruction("2", L("Allow access once"), L("Allow Mail Markdown in Privacy & Security → Accessibility. The app will then show its connection status.")),
+            instruction("3", L("Paste in Mail"), L("Open a Rich Text draft, place the cursor next to existing formatted text and paste Markdown with ⌘V."))
         ], spacing: 18)
         let contents = vertical([
-            pageHeader("Hilfe"),
-            body("Mail Markdown läuft in der Menüleiste und arbeitet mit deinem gewohnten Mail-Fenster."),
-            section("Erste Schritte", views: [instructions]),
+            pageHeader(L("Help")),
+            body(L("Mail Markdown runs in the menu bar and works with your usual Mail window.")),
+            section(L("Getting started"), views: [instructions]),
             separator(),
-            vertical([label("Bereits eingefügten Markdown umwandeln", size: 13, weight: .medium),
-                      body("Markiere den Markdown-Text, drücke ⌘C und danach ⌘V. Die Auswahl wird durch die formatierte Fassung ersetzt.", size: 12)], spacing: 6),
-            vertical([label("Gut zu wissen", size: 13, weight: .medium),
-                      body("Die automatische Umwandlung gilt für ⌘V. Menü- und Rechtsklick-Einfügen werden nicht erfasst. Ist der Stil nicht lesbar oder der Entwurf leer, wird normal eingefügt. Überschriften behalten die Schriftgröße, Code erhält eine gleich große Festbreitenschrift.", size: 12)], spacing: 6),
-            vertical([label("Deine Texte bleiben lokal", size: 13, weight: .medium),
-                      body("Nachrichten- und Zwischenablageninhalte werden auf deinem Mac verarbeitet und weder gespeichert noch hochgeladen. Bilder im Markdown erscheinen als Alternativtext.", size: 12)], spacing: 6)
+            vertical([label(L("Convert Markdown already in a draft"), size: 13, weight: .medium),
+                      body(L("Select the Markdown text, press ⌘C, then ⌘V. The formatted version replaces the selection."), size: 12)], spacing: 6),
+            vertical([label(L("Good to know"), size: 13, weight: .medium),
+                      body(L("Automatic conversion works with ⌘V. Menu and right-click paste are not intercepted. If the style cannot be read or the draft is empty, Mail pastes normally. Headings keep the font size; code uses a monospaced font at the same size."), size: 12)], spacing: 6),
+            vertical([label(L("Your text stays local"), size: 13, weight: .medium),
+                      body(L("Message and clipboard contents are processed on your Mac without being saved or uploaded. Markdown images appear as alternative text."), size: 12)], spacing: 6)
         ], spacing: 20)
         return scrollingPage(contents)
     }
@@ -469,6 +504,11 @@ final class AppWindowController: NSWindowController, NSTextViewDelegate {
 
     func textDidChange(_ notification: Notification) { updatePreview() }
     @objc private func navigate(_ sender: NSButton) { selectPage(sender.tag) }
+    @objc private func changeLanguage() {
+        let index = languagePicker.indexOfSelectedItem
+        guard AppLanguage.allCases.indices.contains(index) else { return }
+        actions.setLanguage(AppLanguage.allCases[index])
+    }
     @objc private func changeEnabled() { actions.setEnabled(enabledSwitch.state == .on) }
     @objc private func changeLogin() { actions.setLaunchAtLogin(loginSwitch.state == .on) }
     @objc private func openAccessibility() { actions.openAccessibility() }
@@ -542,7 +582,7 @@ private final class NativeKeycapView: NSView {
         label.translatesAutoresizingMaskIntoConstraints = false
         addSubview(label)
         NSLayoutConstraint.activate([label.centerXAnchor.constraint(equalTo: centerXAnchor), label.centerYAnchor.constraint(equalTo: centerYAnchor)])
-        setAccessibilityLabel("Tastenkürzel Befehl V")
+        setAccessibilityLabel(L("Keyboard shortcut Command V"))
     }
     convenience init() { self.init(frame: .zero) }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }

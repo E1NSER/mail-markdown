@@ -12,6 +12,7 @@ final class UIPreviewApp: NSObject, NSApplicationDelegate {
     private var clipboardAvailable = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        AppLanguage.select(.english, persist: false)
         NSApp.setActivationPolicy(.regular)
         NSApp.appearance = NSAppearance(named: .aqua)
         configureMenu()
@@ -20,21 +21,35 @@ final class UIPreviewApp: NSObject, NSApplicationDelegate {
             openAccessibility: { [weak self] in self?.permissionGranted = true; self?.refresh() },
             setLaunchAtLogin: { [weak self] value in self?.launchAtLogin = value; self?.refresh() },
             openLoginItems: {},
-            restoreClipboard: { [weak self] in self?.clipboardAvailable = false; self?.refresh() }
+            restoreClipboard: { [weak self] in self?.clipboardAvailable = false; self?.refresh() },
+            setLanguage: { [weak self] in self?.setLanguage($0) }
         )
         controller = AppWindowController(actions: actions, persistWindowFrame: false)
         refresh()
         controller?.present()
     }
 
+    private func setLanguage(_ language: AppLanguage) {
+        guard language != AppLanguage.current else { return }
+        AppLanguage.select(language, persist: false)
+        configureMenu()
+        if let previous = controller {
+            let replacement = previous.localizedReplacement()
+            controller = replacement
+            refresh()
+            replacement.present()
+            previous.close()
+        }
+    }
+
     private func refresh() {
         controller?.update(AppViewState(
             enabled: enabled, permissionGranted: permissionGranted,
             ready: permissionGranted,
-            status: permissionGranted ? (enabled ? "Bereit für Apple Mail" : "Pausiert") : "Bedienungshilfen erforderlich",
+            status: permissionGranted ? (enabled ? L("Ready for Apple Mail") : L("Paused")) : L("Accessibility permission required"),
             canRestoreClipboard: clipboardAvailable,
             launchAtLogin: launchAtLogin, loginNeedsApproval: false,
-            loginStatus: launchAtLogin ? "Mail Markdown startet bei der Anmeldung." : "Der automatische Start ist ausgeschaltet.",
+            loginStatus: launchAtLogin ? L("Mail Markdown opens at login.") : L("Launch at login is off."),
             version: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Development"
         ))
     }
@@ -43,28 +58,28 @@ final class UIPreviewApp: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
         let appItem = NSMenuItem()
         let appMenu = NSMenu()
-        appMenu.addItem(NSMenuItem(title: "UI-Vorschau beenden", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        appMenu.addItem(NSMenuItem(title: L("Quit UI Preview"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         appItem.submenu = appMenu
         menu.addItem(appItem)
         let editItem = NSMenuItem()
-        let editMenu = NSMenu(title: "Bearbeiten")
+        let editMenu = NSMenu(title: L("Edit"))
         for (title, action, key) in [
-            ("Widerrufen", Selector(("undo:")), "z"),
-            ("Ausschneiden", #selector(NSText.cut(_:)), "x"),
-            ("Kopieren", #selector(NSText.copy(_:)), "c"),
-            ("Einfügen", #selector(NSText.paste(_:)), "v"),
-            ("Alles auswählen", #selector(NSText.selectAll(_:)), "a")
+            (L("Undo"), Selector(("undo:")), "z"),
+            (L("Cut"), #selector(NSText.cut(_:)), "x"),
+            (L("Copy"), #selector(NSText.copy(_:)), "c"),
+            (L("Paste"), #selector(NSText.paste(_:)), "v"),
+            (L("Select All"), #selector(NSText.selectAll(_:)), "a")
         ] { editMenu.addItem(NSMenuItem(title: title, action: action, keyEquivalent: key)) }
         editItem.submenu = editMenu
         menu.addItem(editItem)
         let appearanceItem = NSMenuItem()
-        let appearanceMenu = NSMenu(title: "Vorschau")
+        let appearanceMenu = NSMenu(title: L("Preview"))
         for (title, action) in [
-            ("Helle Darstellung", #selector(showLight)),
-            ("Dunkle Darstellung", #selector(showDark)),
-            ("Status: Bereit", #selector(showReady)),
-            ("Status: Freigabe erforderlich", #selector(showPermissionRequired)),
-            ("Zwischenablage: Beispiel verfügbar", #selector(showClipboardAvailable))
+            (L("Light appearance"), #selector(showLight)),
+            (L("Dark appearance"), #selector(showDark)),
+            (L("Status: Ready"), #selector(showReady)),
+            (L("Status: Permission required"), #selector(showPermissionRequired)),
+            (L("Clipboard: Example available"), #selector(showClipboardAvailable))
         ] {
             let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
             item.target = self

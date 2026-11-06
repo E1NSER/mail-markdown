@@ -100,6 +100,11 @@ fi
 if [[ -d "$project_dir/Resources/LICENSES" ]]; then
   ditto "$project_dir/Resources/LICENSES" "$bundle/Contents/Resources/LICENSES"
 fi
+for language in en de; do
+  ditto "$project_dir/Resources/$language.lproj" "$bundle/Contents/Resources/$language.lproj"
+  plutil -lint "$bundle/Contents/Resources/$language.lproj/Localizable.strings"
+done
+swift "$project_dir/scripts/validate-localizations.swift" "$project_dir/Resources"
 plutil -lint "$bundle/Contents/Info.plist"
 codesign --force --sign "$signing_identity" "${signing_options[@]}" "$bundle"
 codesign --verify --strict "$bundle"
