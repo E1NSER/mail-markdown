@@ -193,7 +193,7 @@ final class MailMarkdownApp: NSObject, NSApplicationDelegate, NSWindowDelegate {
             }
             let converted = NSPasteboardItem()
             converted.setData(rtf, forType: .rtf)
-            converted.setString(formatted.string, forType: .string)
+            converted.setString(renderer.plainText(from: formatted), forType: .string)
             originalClipboard = savedOriginal
             board.clearContents()
             guard board.writeObjects([converted]) else {

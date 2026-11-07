@@ -13,7 +13,7 @@ export const previewComponents: Components = {
   a: ({ href, children }) => createElement("a", { href, target: "_blank", rel: "noreferrer" }, children),
   // Images become their alternative text; nothing remote is loaded.
   img: ({ alt }) => createElement("span", null, alt),
-  // Task items use the app's ☑/☐ glyphs in place of the list marker, not form controls.
+  // Task items show the app's ☑/☐ glyphs alongside the list's own marker.
   input: ({ checked }) => createElement("span", { className: "task-marker" }, checked ? "☑" : "☐"),
   // The app writes a thematic break as a short line of box-drawing characters.
   hr: () => createElement("p", { role: "separator" }, "────────"),

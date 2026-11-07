@@ -57,10 +57,84 @@ final class MarkdownRendererTests: XCTestCase {
     func testListsKeepOrderNestingAndTaskState() async {
         let renderer = MarkdownRenderer()
         let result = renderer.render("3. Drei\n4. Vier\n   - Unterpunkt\n\n- [x] Fertig\n- [ ] Offen", style: draftStyle())
-        XCTAssertEqual(result.string, "3.\tDrei\n4.\tVier\n•\tUnterpunkt\n\n☑\tFertig\n☐\tOffen")
+        XCTAssertEqual(renderer.plainText(from: result), "3.\tDrei\n4.\tVier\n\t•\tUnterpunkt\n\n•\t☑ Fertig\n•\t☐ Offen")
         let nestedOffset = (result.string as NSString).range(of: "Unterpunkt").location
         let nestedParagraph = result.attribute(.paragraphStyle, at: nestedOffset, effectiveRange: nil) as! NSParagraphStyle
         XCTAssertGreaterThan(nestedParagraph.headIndent, 17 * 1.8)
+        XCTAssertEqual(nestedParagraph.textLists.count, 2)
+        XCTAssertTrue(nestedParagraph.textLists[0].isOrdered)
+        XCTAssertFalse(nestedParagraph.textLists[1].isOrdered)
+    }
+
+    @MainActor
+    private func rtfRoundTrip(_ text: NSAttributedString) throws -> NSAttributedString {
+        let data = try text.data(from: NSRange(location: 0, length: text.length), documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])
+        return try NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil)
+    }
+
+    @MainActor
+    private func paragraph(in text: NSAttributedString, containing word: String) -> NSParagraphStyle {
+        let offset = (text.string as NSString).range(of: word).location
+        return text.attribute(.paragraphStyle, at: offset, effectiveRange: nil) as! NSParagraphStyle
+    }
+
+    @MainActor
+    func testRTFRoundTripPreservesNativeListsAndStartNumber() async throws {
+        let rendered = MarkdownRenderer().render("3. **Drei**\n4. Vier\n   - Unterpunkt\n5. Fünf\n\nNormal\n\n- Eins\n- Zwei", style: draftStyle())
+        let result = try rtfRoundTrip(rendered)
+        let outer = paragraph(in: result, containing: "Drei").textLists
+        let second = paragraph(in: result, containing: "Vier").textLists
+        let nested = paragraph(in: result, containing: "Unterpunkt").textLists
+        let last = paragraph(in: result, containing: "Fünf").textLists
+        XCTAssertEqual(outer.count, 1)
+        XCTAssertTrue(outer[0].isOrdered)
+        XCTAssertEqual(outer[0].startingItemNumber, 3)
+        XCTAssertTrue(outer[0] === second[0])
+        XCTAssertTrue(outer[0] === last[0])
+        XCTAssertEqual(nested.count, 2)
+        XCTAssertTrue(nested[0] === outer[0])
+        XCTAssertFalse(nested[1].isOrdered)
+        XCTAssertEqual(MarkdownRenderer().plainText(from: result), "3.\tDrei\n4.\tVier\n\t•\tUnterpunkt\n5.\tFünf\n\nNormal\n\n•\tEins\n•\tZwei")
+        XCTAssertTrue(paragraph(in: result, containing: "Normal").textLists.isEmpty)
+        let bullets = paragraph(in: result, containing: "Eins").textLists
+        XCTAssertEqual(bullets.count, 1)
+        XCTAssertFalse(bullets[0].isOrdered)
+        XCTAssertTrue(bullets[0] === paragraph(in: result, containing: "Zwei").textLists[0])
+        let boldOffset = (result.string as NSString).range(of: "Drei").location
+        let font = result.attribute(.font, at: boldOffset, effectiveRange: nil) as! NSFont
+        XCTAssertEqual(font.familyName, "Georgia")
+        XCTAssertEqual(font.pointSize, 17)
+        XCTAssertTrue(NSFontManager.shared.traits(of: font).contains(.boldFontMask))
+        let color = (result.attribute(.foregroundColor, at: boldOffset, effectiveRange: nil) as! NSColor).usingColorSpace(.sRGB)!
+        XCTAssertEqual(color.redComponent, 0.2, accuracy: 1 / 255)
+        XCTAssertEqual(color.greenComponent, 0.3, accuracy: 1 / 255)
+        XCTAssertEqual(color.blueComponent, 0.4, accuracy: 1 / 255)
+    }
+
+    @MainActor
+    func testListContinuationLinesDoNotCreateExtraNumberedItems() async throws {
+        let rendered = MarkdownRenderer().render("3. Drei\n   Fortsetzung\n\n   Weiterer Absatz\n\n4. Vier", style: draftStyle())
+        let imported = try rtfRoundTrip(rendered)
+        let list = paragraph(in: imported, containing: "Drei").textLists[0]
+        for word in ["Drei", "Fortsetzung", "Weiterer Absatz"] {
+            let offset = (imported.string as NSString).range(of: word).location
+            XCTAssertEqual(imported.itemNumber(in: list, at: offset), 1, word)
+        }
+        let secondOffset = (imported.string as NSString).range(of: "Vier").location
+        XCTAssertEqual(imported.itemNumber(in: list, at: secondOffset), 2)
+        XCTAssertEqual(list.startingItemNumber, 3)
+    }
+
+    @MainActor
+    func testNativeListsExportAsSemanticHTMLWithoutDuplicatedMarkers() async throws {
+        let rendered = MarkdownRenderer().render("- **Eins**\n- Zwei\n\n1. Drei\n2. Vier", style: draftStyle())
+        let htmlData = try rendered.data(from: NSRange(location: 0, length: rendered.length), documentAttributes: [.documentType: NSAttributedString.DocumentType.html])
+        let html = String(decoding: htmlData, as: UTF8.self)
+        XCTAssertTrue(html.contains("<ul"))
+        XCTAssertTrue(html.contains("<ol"))
+        XCTAssertEqual(html.components(separatedBy: "<li ").count - 1, 4)
+        XCTAssertFalse(html.contains("•"))
+        XCTAssertFalse(html.contains(">1."))
     }
 
     /// One indentation level: 1.8 em of the 17 pt test font.
@@ -115,60 +189,52 @@ final class MarkdownRendererTests: XCTestCase {
     }
 
     @MainActor
-    func testQuoteInsideListIsIndentedPastTheItemText() async {
-        let result = MarkdownRenderer().render("- Punkt\n  > Zitat\n- Nächster", style: draftStyle())
-        XCTAssertEqual(result.string, "•\tPunkt\nZitat\n•\tNächster")
-        let item = indents(ofParagraphContaining: "Punkt", in: result)
-        XCTAssertEqual(item.first, 0)
-        XCTAssertEqual(item.head, level, accuracy: 0.01)
-        let quote = indents(ofParagraphContaining: "Zitat", in: result)
-        XCTAssertEqual(quote.first, 2 * level, accuracy: 0.01)
-        XCTAssertEqual(quote.head, 2 * level, accuracy: 0.01)
-    }
-
-    @MainActor
     func testListInsideQuoteHangsItsMarkerAtTheQuoteIndent() async {
         let result = MarkdownRenderer().render("> - Punkt", style: draftStyle())
-        XCTAssertEqual(result.string, "•\tPunkt")
+        XCTAssertEqual(MarkdownRenderer().plainText(from: result), "•\tPunkt")
         let item = indents(ofParagraphContaining: "Punkt", in: result)
         XCTAssertEqual(item.first, level, accuracy: 0.01)
         XCTAssertEqual(item.head, 2 * level, accuracy: 0.01)
     }
 
     @MainActor
-    func testListContinuationLinesAlignWithTheItemText() async {
-        let result = MarkdownRenderer().render("- Zeile eins\n  Zeile zwei\n\n1. Schritt\n\n   Erklärung", style: draftStyle())
-        XCTAssertEqual(result.string, "•\tZeile eins\nZeile zwei\n\n1.\tSchritt\nErklärung")
-        for marker in ["Zeile eins", "Schritt"] {
-            let item = indents(ofParagraphContaining: marker, in: result)
-            XCTAssertEqual(item.first, 0, marker)
-            XCTAssertEqual(item.head, level, accuracy: 0.01, marker)
-        }
-        for continuation in ["Zeile zwei", "Erklärung"] {
-            let line = indents(ofParagraphContaining: continuation, in: result)
-            XCTAssertEqual(line.first, level, accuracy: 0.01, continuation)
-            XCTAssertEqual(line.head, level, accuracy: 0.01, continuation)
+    func testQuoteFirstItemKeepsBothLinesAtTheSameIndentAndContinuesTheNativeList() async throws {
+        let renderer = MarkdownRenderer()
+        for (source, ordered) in [
+            ("- > Erste Zitatzeile\n  > Zweite Zitatzeile\n- Nächster Punkt", false),
+            ("3. > Erste Zitatzeile\n   > Zweite Zitatzeile\n4. Nächster Punkt", true),
+        ] {
+            let imported = try rtfRoundTrip(renderer.render(source, style: draftStyle()))
+            let first = paragraph(in: imported, containing: "Erste Zitatzeile")
+            let second = paragraph(in: imported, containing: "Zweite Zitatzeile")
+            let next = paragraph(in: imported, containing: "Nächster Punkt")
+            let list = try XCTUnwrap(first.textLists.last)
+            XCTAssertEqual(list.isOrdered, ordered)
+            XCTAssertEqual(first.tabStops.first?.location ?? -1, 2 * level, accuracy: 0.5)
+            XCTAssertEqual(second.headIndent, first.headIndent, accuracy: 0.5)
+            XCTAssertEqual(next.headIndent, level, accuracy: 0.5)
+            XCTAssertTrue(second.textLists.last === list)
+            XCTAssertTrue(next.textLists.last === list)
+            let string = imported.string as NSString
+            XCTAssertEqual(imported.itemNumber(in: list, at: string.range(of: "Zweite Zitatzeile").location), 1)
+            XCTAssertEqual(imported.itemNumber(in: list, at: string.range(of: "Nächster Punkt").location), 2)
         }
     }
 
     @MainActor
-    func testRTFRoundTripKeepsQuoteAndListIndents() async throws {
-        let rendered = MarkdownRenderer().render("> Zitat\n\n- Punkt\n  Weiter\n\nText", style: draftStyle())
-        let data = try rendered.data(from: NSRange(location: 0, length: rendered.length), documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])
-        let imported = try NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil)
-        XCTAssertEqual(imported.string, "Zitat\n\n•\tPunkt\nWeiter\n\nText")
-        let quote = indents(ofParagraphContaining: "Zitat", in: imported)
-        XCTAssertEqual(quote.first, level, accuracy: 0.5)
-        XCTAssertEqual(quote.head, level, accuracy: 0.5)
-        let item = indents(ofParagraphContaining: "Punkt", in: imported)
-        XCTAssertEqual(item.first, 0, accuracy: 0.5)
-        XCTAssertEqual(item.head, level, accuracy: 0.5)
-        let continuation = indents(ofParagraphContaining: "Weiter", in: imported)
-        XCTAssertEqual(continuation.first, level, accuracy: 0.5)
-        XCTAssertEqual(continuation.head, level, accuracy: 0.5)
-        let text = indents(ofParagraphContaining: "Text", in: imported)
-        XCTAssertEqual(text.first, 0, accuracy: 0.5)
-        XCTAssertEqual(text.head, 0, accuracy: 0.5)
+    func testQuoteAfterListTextStaysInOneItemAcrossQuoteParagraphs() async throws {
+        let source = "1. Einleitung\n   > Erste Zeile\n   > Zweite Zeile\n   >\n   > Weiterer Absatz\n2. Nächster Punkt\n\nNormal"
+        let imported = try rtfRoundTrip(MarkdownRenderer().render(source, style: draftStyle()))
+        let body = paragraph(in: imported, containing: "Einleitung")
+        let list = try XCTUnwrap(body.textLists.last)
+        let string = imported.string as NSString
+        for text in ["Erste Zeile", "Zweite Zeile", "Weiterer Absatz"] {
+            let quote = paragraph(in: imported, containing: text)
+            XCTAssertEqual(quote.headIndent, body.headIndent, accuracy: 0.5)
+            XCTAssertEqual(imported.itemNumber(in: list, at: string.range(of: text).location), 1)
+        }
+        XCTAssertEqual(imported.itemNumber(in: list, at: string.range(of: "Nächster Punkt").location), 2)
+        XCTAssertTrue(paragraph(in: imported, containing: "Normal").textLists.isEmpty)
     }
 
     @MainActor

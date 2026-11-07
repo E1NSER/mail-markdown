@@ -23,7 +23,7 @@ The current architecture targets direct distribution. It uses Accessibility to r
 
 The Mail Native interface has a compact sidebar, native controls and automatic light/dark appearance. **Version 1.2.0** uses English by default and offers German under **General → System → Language**. Your selection is saved and applies immediately. The Universal installer is signed with Developer ID and notarized by Apple.
 
-The upcoming **1.2.1** release indents quotes on every line and aligns multi-line list items with their text; see [its release notes](docs/release-notes-v1.2.1.md). This is available in source and local builds; the public installer remains **1.2.0** until the new notarization completes.
+The upcoming **1.2.1** release indents quotes on every line and preserves native list structure, including aligned continuation lines. The public installer remains **1.2.0** while the combined build awaits Apple Mail verification and notarization. See the [1.2.1 release notes](docs/release-notes-v1.2.1.md).
 
 ## Requirements
 
@@ -65,7 +65,8 @@ Closing the settings window leaves the menu-bar app running. Reopen it through *
 
 - Supports bold, italic, strikethrough, links, lists, headings, quotes and code. Tables become tab-separated rows.
 - Body text inherits the sampled draft style. Headings keep its font size and become bold; code uses a monospaced font at the same size.
-- Lists and quotes indent by 1.8 em per level. A list marker hangs in front of its item text; quotes have no marker or bar, so every quoted line, including the first, starts at the indent. Task-list items use ☑/☐ as their marker, and a horizontal rule becomes a short line (────────).
+- Ordered and unordered lists preserve native list structure, including nesting and ordered starting numbers. List markers hang in front of the item text, and continuation lines align with the text. Task items include ☑ or ☐ at the start of the text within the list item. The current RTF renderer represents a continuation paragraph after a nested sublist as a separate item in the parent list.
+- Standalone quotes indent every line by 1.8 em per level without a quote marker or bar. Within a native list item, quote lines share the item's text column and keep its marker. A horizontal rule becomes a short line (────────).
 - The style sample comes from a neighboring character. An empty draft, unreadable style data or a very large paste uses Mail's normal paste behavior. A toolbar formatting change without a corresponding styled character cannot be sampled yet.
 - Automatic conversion handles **⌘V** in Mail's message body. Subject, recipient and search fields remain ordinary input fields. Menu/context-menu paste and **⌘⇧V** are not intercepted.
 - Mail's Accessibility structure can vary by macOS version and UI language. Compose-window detection currently recognizes English and German Send controls; other localizations may need adjustments. The macOS 13 deployment target is not a claim of integration testing on every supported OS version.
@@ -89,6 +90,8 @@ swift test
 The test suite covers Markdown rendering, draft-style inheritance, list and quote indentation, safe link handling and RTF export/import. The app uses RTF for rich-text paste; AppKit's HTML export changed colors during testing.
 
 Test the complete Mail flow with **real keyboard input** in a disposable, unsent draft. Setting Mail's contents through scripting does not exercise the keyboard event tap. The physical **⌘C → ⌘V** flow, including bold and italic formatting, was confirmed on a development Mac; renderer tests alone do not prove end-to-end compatibility with every macOS/Mail version.
+
+In a standalone development build, a physical **⌘V → Return** continued both ordered and unordered lists in Apple Mail. The combined quote and native list changes in 1.2.1 still need an Apple Mail check.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, testing and pull-request guidance.
 

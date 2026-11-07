@@ -1,12 +1,16 @@
-**Release candidate — public installer pending Apple notarization.**
+**Release candidate. Combined Apple Mail validation and Apple notarization are pending.**
 
-Mail Markdown 1.2.1 makes quotes visibly indented and lines up multi-line list items.
+Mail Markdown 1.2.1 indents every line of a quote and pastes editable lists into Apple Mail.
 
 - **Quotes are indented on every line.** Each quote level starts 1.8 em in, including the first line, so a one-line quote such as `> Thanks for the feedback!` no longer looks like ordinary text. Previously only wrapped lines moved in.
-- **Quotes inside lists** are indented past the item text. Lists inside quotes place their marker at the quote's indent.
-- **Multi-line list items** align follow-up lines and further paragraphs with the item text instead of the bullet.
-- **Text after a list** no longer takes on the list's indent for its wrapped lines.
-- The website's live preview now follows the app's output more closely: quotes without a bar, code at text size, tab-separated tables, ☑/☐ task markers and every heading at text size.
+- **Quotes inside lists** align their lines within the same native list item. Quotes after an introduction follow that item's text column. Mail controls the list marker and text column.
+- **Native ordered and unordered lists** retain their structure, nesting and ordered starting numbers. The plain-text fallback keeps readable bullets and numbers.
+- **Multi-line list items** align follow-up lines and further paragraphs with the item text. A continuation paragraph after a nested sublist currently becomes a separate item in the parent list during RTF conversion.
+- **Task items** include ☑ or ☐ at the start of the text within the native list item. The list still supplies its own bullet or number.
+- **Text after a list** keeps its body paragraph style, including on wrapped lines.
+- The website's live preview follows the app's formatting more closely. Quotes appear without a bar, code and headings keep the text size, tables use tab-separated rows and tasks display ☑ or ☐.
+
+In the standalone development build, Apple Mail continued both ordered and unordered lists after a physical **⌘V → Return**. The combined build still needs an Apple Mail check of list continuation and quotes, including quotes and lists nested within one another.
 
 **Installer:** Universal app for Apple Silicon and Intel, macOS 13 or later. The public `Mail-Markdown-universal-notarized.dmg` and `SHA256SUMS` will be published after successful Apple notarization.
 
@@ -18,6 +22,8 @@ Free, unlimited and open source under the MIT License. Text is processed locally
 
 ---
 
-**Deutsch:** Zitate werden jetzt auf jeder Zeile eingerückt, auch auf der ersten. Ein einzeiliges Zitat wie `> Danke für das Feedback!` sieht damit nicht mehr wie normaler Text aus. Zitate in Listen rücken über den Text des Listenpunkts hinaus ein. Folgezeilen und weitere Absätze eines Listenpunkts stehen bündig mit dessen Text statt unter dem Aufzählungszeichen. Text nach einer Liste übernimmt deren Einzug nicht mehr. Die Live-Vorschau auf der Website entspricht nun genauer dem Ergebnis der App.
+**Deutsch.** Eigenständige Zitate werden auf jeder Zeile eingerückt, auch auf der ersten. Zitate in Listen bleiben innerhalb ihres Listenpunkts und ihre Zeilen stehen bündig. Apple Mail steuert dabei die Textspalte und das Listenzeichen. Aufzählungen und nummerierte Listen bleiben als Listen bearbeitbar. Folgt auf eine Unterliste ein weiterer Absatz desselben Listenpunkts, erscheint er in der aktuellen RTF-Ausgabe als eigener Punkt in der übergeordneten Liste. Bei Aufgaben stehen ☑ oder ☐ am Anfang des Textes, zusätzlich zum Aufzählungszeichen oder zur Nummer. Text nach einer Liste behält seinen Absatzeinzug.
+
+Im separaten Testbuild setzte Apple Mail nach **⌘V → Return** beide Listentypen fort. Der gemeinsame Test mit den Änderungen für Zitate steht noch aus.
 
 [Report an issue](https://github.com/E1NSER/mail-markdown/issues) · [App privacy](https://github.com/E1NSER/mail-markdown/blob/main/PRIVACY.md)
