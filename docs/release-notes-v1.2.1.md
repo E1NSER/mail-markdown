@@ -8,6 +8,7 @@ Mail Markdown 1.2.1 indents every line of a quote and pastes editable lists into
 - **Multi-line list items** align follow-up lines and further paragraphs with the item text. A continuation paragraph after a nested sublist currently becomes a separate item in the parent list during RTF conversion.
 - **Task items** include ☑ or ☐ at the start of the text within the native list item. The list still supplies its own bullet or number.
 - **Text after a list** keeps its body paragraph style, including on wrapped lines.
+- If Mail briefly fails to report the editor focus, the app retries in the same compose window and verifies the clipboard before formatting.
 - The website's live preview follows the app's formatting more closely. Quotes appear without a bar, code and headings keep the text size, tables use tab-separated rows and tasks display ☑ or ☐.
 
 In the standalone development build, Apple Mail continued both ordered and unordered lists after a physical **⌘V → Return**. The combined build still needs an Apple Mail check of list continuation and quotes, including quotes and lists nested within one another.

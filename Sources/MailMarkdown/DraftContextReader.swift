@@ -5,6 +5,7 @@ import MailMarkdownCore
 @MainActor
 struct DraftContext {
     let element: AXUIElement
+    let window: AXUIElement
     let selectedRange: CFRange
     let style: DraftStyle
 }
@@ -14,6 +15,7 @@ struct DraftContext {
 @MainActor
 final class DraftContextReader {
     private(set) var lastFailure = "Noch kein Mail-Entwurf geprüft."
+    private(set) var windowAwaitingFocus: AXUIElement?
 
     private struct BodyFocus {
         let body: AXUIElement
@@ -45,6 +47,7 @@ final class DraftContextReader {
         lastFailure = ""
         return DraftContext(
             element: focus.body,
+            window: focus.window,
             selectedRange: selection.range,
             style: DraftStyle(font: font, foregroundColor: foreground, paragraphStyle: paragraph)
         )
@@ -53,12 +56,22 @@ final class DraftContextReader {
     func stillMatches(_ context: DraftContext) -> Bool {
         guard let focus = currentBody(),
               CFEqual(focus.body, context.element),
+              CFEqual(focus.window, context.window),
               let current = selection(of: focus.body) else { return false }
         return current.range.location == context.selectedRange.location
             && current.range.length == context.selectedRange.length
     }
 
+    func isFocusedWindow(_ window: AXUIElement) -> Bool {
+        guard let application = NSWorkspace.shared.frontmostApplication,
+              application.bundleIdentifier == "com.apple.mail",
+              let current = elementAttribute(AXUIElementCreateApplication(application.processIdentifier),
+                                             kAXFocusedWindowAttribute) else { return false }
+        return CFEqual(current, window)
+    }
+
     private func currentBody() -> BodyFocus? {
+        windowAwaitingFocus = nil
         guard let application = NSWorkspace.shared.frontmostApplication,
               application.bundleIdentifier == "com.apple.mail" else {
             return failBody("Apple Mail ist nicht im Vordergrund.")
@@ -70,6 +83,10 @@ final class DraftContextReader {
         let system = AXUIElementCreateSystemWide()
         guard let focused = elementAttribute(system, kAXFocusedUIElementAttribute)
             ?? elementAttribute(mail, kAXFocusedUIElementAttribute) else {
+            if let body = focusedMessageBody(in: window) {
+                return BodyFocus(body: body, window: window)
+            }
+            windowAwaitingFocus = window
             return failBody("Mail liefert kein fokussiertes Bedienelement.")
         }
         guard let body = resolveBody(from: focused) else {
@@ -84,6 +101,29 @@ final class DraftContextReader {
             return failBody("Der Nachrichtentext gehört nicht zum fokussierten Mail-Entwurf.")
         }
         return BodyFocus(body: body, window: window)
+    }
+
+    private func focusedMessageBody(in window: AXUIElement) -> AXUIElement? {
+        // WebKit can report focus on the editor itself while neither
+        // application-level focus query has a value. Never infer focus just
+        // because a compose window contains a message body.
+        var pending: [(AXUIElement, Int)] = [(window, 0)]
+        var visited = 0
+        while let (element, depth) = pending.popLast(), visited < 80 {
+            visited += 1
+            let role = stringAttribute(element, kAXRoleAttribute)
+            if role == "AXWebArea" || role == kAXTextAreaRole as String {
+                if boolAttribute(element, kAXFocusedAttribute) == true,
+                   let body = resolveBody(from: element) { return body }
+                continue
+            }
+            guard depth < 6,
+                  role != kAXToolbarRole as String,
+                  role != kAXTextFieldRole as String,
+                  let children = attribute(element, kAXChildrenAttribute) as? [AXUIElement] else { continue }
+            pending.append(contentsOf: children.map { ($0, depth + 1) })
+        }
+        return nil
     }
 
     private func resolveBody(from focused: AXUIElement) -> AXUIElement? {

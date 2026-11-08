@@ -150,34 +150,69 @@ final class MailMarkdownApp: NSObject, NSApplicationDelegate, NSWindowDelegate {
         busy = true
         let requestedPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
         DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.processPaste(requestedPID: requestedPID)
-            self.busy = false
+            self?.processPaste(requestedPID: requestedPID)
         }
         return nil
     }
 
-    private func processPaste(requestedPID: pid_t?) {
+    private struct PasteFocusRetry {
+        let window: AXUIElement
+        let clipboardChangeCount: Int
+    }
+
+    private func processPaste(requestedPID: pid_t?, retry: PasteFocusRetry? = nil) {
+        var scheduledRetry = false
+        defer { if !scheduledRetry { busy = false } }
+
         guard NSWorkspace.shared.frontmostApplication?.processIdentifier == requestedPID else {
             setStatus("Paste cancelled: window changed")
             return
         }
         let board = NSPasteboard.general
-        let beforeCount = board.changeCount
+        let beforeCount = retry?.clipboardChangeCount ?? board.changeCount
+        if let retry, !contextReader.isFocusedWindow(retry.window) {
+            setStatus("Paste cancelled: window changed")
+            return
+        }
+        guard board.changeCount == beforeCount else {
+            setStatus("Paste cancelled: clipboard changed")
+            return
+        }
         let clipboardText = board.string(forType: .string)
         guard board.changeCount == beforeCount else {
             setStatus("Paste cancelled: clipboard changed")
             return
         }
-        guard let markdown = clipboardText, markdown.utf16.count <= 100_000,
-              renderer.containsMarkdown(markdown) else { postPaste(to: requestedPID); return }
+        guard enabled, let markdown = clipboardText, markdown.utf16.count <= 100_000,
+              renderer.containsMarkdown(markdown) else {
+            if retry == nil { postPaste(to: requestedPID) }
+            return
+        }
         guard let context = contextReader.currentDraft() else {
             guard board.changeCount == beforeCount else {
                 setStatus("Paste cancelled: clipboard changed")
                 return
             }
+            if retry == nil, let window = contextReader.windowAwaitingFocus {
+                scheduledRetry = true
+                let request = PasteFocusRetry(window: window, clipboardChangeCount: beforeCount)
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(60)) { [weak self] in
+                    self?.processPaste(requestedPID: requestedPID, retry: request)
+                }
+                return
+            }
+            if retry != nil {
+                // A field in the same window can gain focus during the delay.
+                // Replaying into an unverified target could paste into that field.
+                setStatus("Paste cancelled: selection changed", diagnostic: contextReader.lastFailure)
+                return
+            }
             setStatus("Pasted normally · text style unavailable", diagnostic: contextReader.lastFailure)
             postPaste(to: requestedPID)
+            return
+        }
+        if let retry, !CFEqual(context.window, retry.window) {
+            setStatus("Paste cancelled: window changed")
             return
         }
         let formatted = renderer.render(markdown, style: context.style)
@@ -199,7 +234,7 @@ final class MailMarkdownApp: NSObject, NSApplicationDelegate, NSWindowDelegate {
             guard board.writeObjects([converted]) else {
                 restoreSnapshotIfAvailable(board)
                 setStatus("Could not write to the clipboard")
-                postPaste(to: requestedPID)
+                if retry == nil { postPaste(to: requestedPID) }
                 return
             }
             stagedChangeCount = board.changeCount
@@ -211,7 +246,12 @@ final class MailMarkdownApp: NSObject, NSApplicationDelegate, NSWindowDelegate {
             }
             postPaste(to: requestedPID)
             setStatus("Markdown ready · using draft style")
+            if retry != nil { diagnostics.notice("Mail editor focus recovered on retry.") }
         } catch {
+            guard retry == nil || (contextReader.stillMatches(context) && board.changeCount == beforeCount) else {
+                setStatus("Paste cancelled: selection or clipboard changed")
+                return
+            }
             setStatus("Formatting failed · pasted normally")
             postPaste(to: requestedPID)
         }
