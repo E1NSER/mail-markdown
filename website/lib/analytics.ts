@@ -1,4 +1,5 @@
 import { CONSENT_MAX_AGE_MS, isCurrentConsent, type ConsentChoice } from "./consent.ts";
+import { siteTitles } from "./i18n.ts";
 import { LATEST_DOWNLOAD_URL, RELEASE_ASSET_NAME } from "./release-model.ts";
 import { SITE_URL } from "./site.ts";
 
@@ -11,9 +12,9 @@ export const DENIED_CONSENT = Object.freeze({
 const STATISTICS_CONSENT = Object.freeze({ ...DENIED_CONSENT, analytics_storage: "granted" });
 export const ANALYTICS_COOKIE_PREFIX = "mm";
 const PAGES: Record<string, string> = {
-  "/": "Mail Markdown — Markdown for Apple Mail",
-  "/en": "Mail Markdown — Markdown for Apple Mail",
-  "/de": "Mail Markdown — Markdown-Erweiterung für Apple Mail",
+  "/": siteTitles.en,
+  "/en": siteTitles.en,
+  "/de": siteTitles.de,
   "/en/privacy": "Privacy · Mail Markdown",
   "/de/privacy": "Datenschutz · Mail Markdown",
   "/en/legal-notice": "Legal notice · Mail Markdown",

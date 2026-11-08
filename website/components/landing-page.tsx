@@ -34,20 +34,20 @@ function downloadAnswer(release: ReleaseState, locale: Locale): string {
 
 function getFaqs(release: ReleaseState, locale: Locale) {
   if (locale === "en") return [
-    ["How does Mail Markdown extend Apple Mail?", "Mail Markdown adds Markdown formatting to ⌘V directly in Apple Mail. You still write and send messages in your familiar Mail editor. The companion runs as a separate app in the macOS menu bar. It is installed separately and does not appear in Mail’s Extensions settings."],
+    ["How does Mail Markdown work with Apple Mail?", "Mail Markdown adds Markdown formatting to ⌘V directly in Apple Mail. You still write and send messages in your familiar Mail editor. The companion app is installed separately and runs in the macOS menu bar. It is not a Mail extension, so it does not appear in Mail’s Extensions settings."],
     ["How do I use email text from an AI chat?", "Ask for your email as Markdown. Copy the Markdown source, including asterisks, list markers and links, then paste it with ⌘V into an existing Apple Mail draft. Mail Markdown turns it into real formatting using your draft’s font, size and color."],
     ["What happens to copied black backgrounds?", "When it recognizes Markdown, Mail Markdown rebuilds the formatting using your draft’s style. Fonts, colors and backgrounds from the source are not imported during this conversion. It does not automatically clean up text that was already pasted incorrectly. Without recognized Markdown or a readable style sample, Apple Mail’s normal paste behavior applies."],
     ["Is Mail Markdown really free?", "Yes. The app is free and unlimited. There is no subscription, account or Markdown quota. Its source code is available on GitHub under the MIT License."],
     ["How do I get the app?", downloadAnswer(release, locale)],
-    ["What stays from my Mail style?", "The app samples the font, size and text color from a neighboring character in your draft. Markdown adds formatting such as bold, italic, lists and links. Headings retain the font size; code uses a monospaced font at the same size."],
+    ["What stays from my Mail style?", "The app samples the font, size and text color from a neighboring character in your draft. Markdown adds formatting such as bold, italic, lists and links. Headings retain the font size; code uses a monospaced font at the same size. Quotes are indented as a block."],
     ["What happens to my messages?", "The app processes text locally on your Mac. There is no conversion server or analytics. It needs Accessibility permission to read the draft style. A temporary in-memory copy lets you restore the original clipboard."],
     ["Does it work in every draft?", "You need a Rich Text draft in Apple Mail with existing text to sample. In an empty draft, or if the font cannot be read, text is pasted normally. Automatic conversion uses the regular ⌘V shortcut; paste from menus is not intercepted."],
     ["Is the app in the Mac App Store?", "Not currently. Mail Markdown is a standalone companion app for Apple Mail. Its current Accessibility integration requires direct distribution. An App Store version would need a different workflow."],
   ];
   return [
     [
-      "Wie erweitert Mail Markdown Apple Mail?",
-      "Mail Markdown ergänzt das Einfügen mit ⌘V direkt in Apple Mail. Du schreibst und versendest weiterhin in deinem gewohnten Mail-Editor. Die Erweiterung läuft dafür als eigenständige App in der macOS-Menüleiste. Sie wird separat installiert und erscheint nicht in Mails Erweiterungseinstellungen.",
+      "Wie arbeitet Mail Markdown mit Apple Mail zusammen?",
+      "Mail Markdown ergänzt das Einfügen mit ⌘V direkt in Apple Mail. Du schreibst und versendest weiterhin in deinem gewohnten Mail-Editor. Die Begleit-App wird separat installiert und läuft in der macOS-Menüleiste. Sie ist keine Mail-Erweiterung und erscheint daher nicht in Mails Erweiterungseinstellungen.",
     ],
     [
       "Wie nutze ich E-Mail-Texte aus einem KI-Chat?",
@@ -64,7 +64,7 @@ function getFaqs(release: ReleaseState, locale: Locale) {
     ["Wie bekomme ich die App?", downloadAnswer(release, locale)],
     [
       "Was bleibt von meinem Mail-Stil erhalten?",
-      "Die App übernimmt Schriftart, Schriftgröße und Textfarbe aus einem benachbarten Zeichen im Entwurf. Markdown ergänzt dazu zum Beispiel Fett- und Kursivschrift, Listen und Links. Überschriften behalten die Schriftgröße; Code erscheint in einer gleich großen Monospace-Schrift.",
+      "Die App übernimmt Schriftart, Schriftgröße und Textfarbe aus einem benachbarten Zeichen im Entwurf. Markdown ergänzt dazu zum Beispiel Fett- und Kursivschrift, Listen und Links. Überschriften behalten die Schriftgröße; Code erscheint in einer gleich großen Monospace-Schrift. Zitate werden als Block eingerückt.",
     ],
     [
       "Was passiert mit meinen Nachrichten?",
@@ -102,7 +102,7 @@ export function LandingPage({ locale, release, stars }: { locale: Locale; releas
                   <span>In Apple Mail.</span>
                 </h1>
                 <p className="hero-description">
-                  {t("Paste Markdown from your AI chat into Apple Mail with ⌘V. The extension uses your draft’s font, size and color.", "Füge Markdown aus deinem KI-Chat mit ⌘V in Apple Mail ein. Die Erweiterung übernimmt Schrift, Größe und Farbe deines Entwurfs.")}
+                  {t("Paste Markdown from your AI chat into Apple Mail with ⌘V. The companion app uses your draft’s font, size and color.", "Füge Markdown aus deinem KI-Chat mit ⌘V in Apple Mail ein. Die Begleit-App übernimmt Schrift, Größe und Farbe deines Entwurfs.")}
                 </p>
                 <div className="hero-actions">
                   <DownloadButton
@@ -142,7 +142,7 @@ export function LandingPage({ locale, release, stars }: { locale: Locale; releas
                       {t("Rich text from an AI chat often brings unwanted fonts, colors or black backgrounds. Plain Markdown appears in Apple Mail as asterisks and list markers.", "Rich Text aus dem KI-Chat bringt oft fremde Schriften, Farben oder schwarze Hintergründe mit. Reines Markdown wiederum zeigt Apple Mail als Sternchen und Listenzeichen.")}
                     </p>
                     <p>
-                      {t("Mail Markdown extends your ⌘V: it formats Markdown directly in Apple Mail, using the style of your draft.", "Mail Markdown ergänzt dein ⌘V: Die Erweiterung formatiert Markdown direkt in Apple Mail – im Stil deines Entwurfs.")}
+                      {t("Mail Markdown extends your ⌘V: it formats Markdown directly in Apple Mail, using the style of your draft.", "Mail Markdown ergänzt dein ⌘V: Die Begleit-App formatiert Markdown direkt in Apple Mail – im Stil deines Entwurfs.")}
                     </p>
                   </div>
                 </div>

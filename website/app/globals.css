@@ -1070,56 +1070,77 @@ h1 > span {
   min-height: 355px;
   overflow-wrap: anywhere;
 }
+/* Mirrors Sources/MailMarkdownCore/MarkdownRenderer.swift; see lib/mail-preview.ts. */
 .rendered-markdown p {
   margin: 0 0 17px;
 }
+/* Every heading level keeps the draft's size and only becomes bold. */
 .rendered-markdown h1,
 .rendered-markdown h2,
-.rendered-markdown h3 {
+.rendered-markdown h3,
+.rendered-markdown h4,
+.rendered-markdown h5,
+.rendered-markdown h6 {
   font-size: 1em;
   font-weight: 700;
   letter-spacing: 0;
   line-height: inherit;
-  margin-bottom: 17px;
+  margin: 0 0 17px;
 }
+/* 1.8 em per list level, with the marker hanging in front of the text. */
 .rendered-markdown ul,
 .rendered-markdown ol {
-  padding-left: 22px;
+  padding-left: 1.8em;
   margin: 0 0 17px;
 }
-.rendered-markdown li p {
-  margin: 0;
+.rendered-markdown ul {
+  list-style-type: disc;
 }
+/* Quotes indent every line by 1.8 em per level, in the draft's color and without a bar. */
 .rendered-markdown blockquote {
-  border-left: 2px solid #cad3df;
   margin: 0 0 17px;
-  padding-left: 14px;
-  opacity: 0.8;
+  padding-left: 1.8em;
 }
-.rendered-markdown blockquote p {
-  margin: 0;
+.rendered-markdown blockquote > :last-child {
+  margin-bottom: 0;
 }
 .rendered-markdown code {
   font-family: var(--font-mono), monospace;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 .rendered-markdown pre {
   white-space: pre-wrap;
+  margin: 0 0 17px;
 }
 .rendered-markdown a {
   text-decoration: underline;
   text-underline-offset: 3px;
   color: inherit;
 }
+/* Tables become tab-separated lines with a bold header row. */
+.rendered-markdown table,
+.rendered-markdown thead,
+.rendered-markdown tbody,
+.rendered-markdown tr {
+  display: block;
+}
 .rendered-markdown table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 0.9em;
+  margin: 0 0 17px;
 }
 .rendered-markdown th,
 .rendered-markdown td {
-  padding: 4px 6px;
-  border-bottom: 1px solid #e6e9ed;
+  display: inline;
+  padding: 0;
+  white-space: pre-wrap;
+}
+.rendered-markdown th:not(:last-child)::after,
+.rendered-markdown td:not(:last-child)::after {
+  content: "\9";
+}
+/* Blocks inside a list item follow each other without a blank line. */
+.rendered-markdown li > *,
+.rendered-markdown li p {
+  margin: 0;
 }
 .conversion-divider {
   display: none;

@@ -80,7 +80,7 @@ Jeder stabile Release im Repository `E1NSER/mail-markdown` enthält genau das ge
 
 Die folgenden Befehle sind eine Anleitung für die verantwortliche Person. Sie setzen eine bereits angemeldete GitHub CLI (`gh`) mit Schreibrechten voraus und veröffentlichen beim letzten Schritt tatsächlich den Release. Zugangsdaten gehören weder in die Befehle noch in Projektdateien.
 
-Zuerst die Version aus der Quell-Plist übernehmen und mit der fertig gebauten App vergleichen. Der zugehörige Tag ist `v<CFBundleShortVersionString>`, aktuell also `v1.2.0`. Er muss bereits im Remote-Repository auf den geprüften Quellstand zeigen; `--verify-tag` verhindert, dass GitHub beiläufig einen neuen Tag auf einem anderen Stand erstellt.
+Zuerst die Version aus der Quell-Plist übernehmen und mit der fertig gebauten App vergleichen. Der zugehörige Tag ist `v<CFBundleShortVersionString>`, aktuell also `v1.2.1`. Er muss bereits im Remote-Repository auf den geprüften Quellstand zeigen; `--verify-tag` verhindert, dass GitHub beiläufig einen neuen Tag auf einem anderen Stand erstellt.
 
 ```sh
 release_version="$(/usr/bin/plutil -extract CFBundleShortVersionString raw -o - Resources/Info.plist)"

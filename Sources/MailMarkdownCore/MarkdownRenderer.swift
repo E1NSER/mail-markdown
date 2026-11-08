@@ -47,7 +47,52 @@ public struct MarkdownRenderer {
         if markdown.hasSuffix("\n"), !output.string.hasSuffix("\n") {
             output.append(attributed("\n", context: context))
         }
+        // RTF requires a paragraph's terminating return to carry that paragraph's
+        // style too. Otherwise transitions out of a nested list can be lost.
+        let source = output.string as NSString
+        var location = 0
+        while location < source.length {
+            let range = source.paragraphRange(for: NSRange(location: location, length: 0))
+            if let paragraph = output.attribute(.paragraphStyle, at: location, effectiveRange: nil) {
+                output.addAttribute(.paragraphStyle, value: paragraph, range: range)
+            }
+            location = NSMaxRange(range)
+        }
         return output
+    }
+
+    /// TextKit 2 stores list markers as paragraph metadata on recent macOS versions.
+    /// Supply readable markers for clients that can only paste plain text as well.
+    public func plainText(from rendered: NSAttributedString) -> String {
+        let source = rendered.string as NSString
+        var result = ""
+        var location = 0
+        var numbers: [ObjectIdentifier: Int] = [:]
+        while location < source.length {
+            let range = source.paragraphRange(for: NSRange(location: location, length: 0))
+            let paragraph = rendered.attribute(.paragraphStyle, at: location, effectiveRange: nil) as? NSParagraphStyle
+            var content = source.substring(with: range)
+            if let list = paragraph?.textLists.last {
+                let identity = ObjectIdentifier(list)
+                let number = numbers[identity] ?? list.startingItemNumber
+                numbers[identity] = number + 1
+                result += String(repeating: "\t", count: max(0, (paragraph?.textLists.count ?? 1) - 1))
+                let marker = list.marker(forItemNumber: number)
+                let legacyPrefix = "\t" + marker + "\t"
+                if includesListMarkers, content.hasPrefix(legacyPrefix) {
+                    content.removeFirst(legacyPrefix.count)
+                }
+                result += marker + "\t"
+            }
+            result += content
+            location = NSMaxRange(range)
+        }
+        return result.replacingOccurrences(of: "\u{2028}", with: "\n")
+    }
+
+    private var includesListMarkers: Bool {
+        if #available(macOS 26.0, *) { return NSTextList.includesTextListMarkers }
+        return true
     }
 
     private struct Context {
@@ -57,6 +102,7 @@ public struct MarkdownRenderer {
         var strike = false
         var code = false
         var listDepth = 0
+        var textLists: [NSTextList] = []
         var quoteDepth = 0
     }
 
@@ -67,11 +113,15 @@ public struct MarkdownRenderer {
         if context.bold { font = NSFontManager.shared.convert(font, toHaveTrait: .boldFontMask) }
         if context.italic { font = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask) }
         let paragraph = context.style.paragraphStyle.mutableCopy() as! NSMutableParagraphStyle
+        paragraph.textLists += context.textLists
         if context.listDepth > 0 || context.quoteDepth > 0 {
-            let indent = font.pointSize * 1.8 * CGFloat(context.listDepth + context.quoteDepth)
-            paragraph.firstLineHeadIndent += max(0, indent - font.pointSize * 1.8)
-            paragraph.headIndent += indent
-            paragraph.tabStops = [NSTextTab(textAlignment: .left, location: paragraph.headIndent)]
+            let level = context.style.font.pointSize * 1.8
+            paragraph.headIndent += level * CGFloat(context.listDepth + context.quoteDepth)
+            paragraph.firstLineHeadIndent = paragraph.headIndent
+            if context.listDepth > 0 {
+                paragraph.firstLineHeadIndent -= level
+                paragraph.tabStops = [NSTextTab(textAlignment: .left, location: paragraph.headIndent)]
+            }
         }
         var result: [NSAttributedString.Key: Any] = [
             .font: font,
@@ -108,7 +158,7 @@ public struct MarkdownRenderer {
         case let text as Markdown.Text:
             return attributed(text.string, context: context)
         case is SoftBreak, is LineBreak:
-            return attributed("\n", context: context)
+            return attributed(context.listDepth > 0 ? "\u{2028}" : "\n", context: context)
         case is Strong:
             var child = context
             child.bold = true
@@ -136,7 +186,7 @@ public struct MarkdownRenderer {
             var child = context
             child.code = true
             let content = code.code.hasSuffix("\n") ? String(code.code.dropLast()) : code.code
-            return attributed(content, context: child)
+            return attributed(context.listDepth > 0 ? content.replacingOccurrences(of: "\n", with: "\u{2028}") : content, context: child)
         case let link as Link:
             let output = renderInlines(node, context: context)
             if let destination = link.destination,
@@ -159,6 +209,11 @@ public struct MarkdownRenderer {
         case let list as UnorderedList:
             return renderList(list.children, context: context, start: nil)
         case is BlockQuote:
+            // A list item has one paragraph style. Soft breaks keep the quote
+            // in the current item, with the indent selected by renderList.
+            if context.listDepth > 0 {
+                return renderItemBlocks(node.children, context: context)
+            }
             var child = context
             child.quoteDepth += 1
             return renderBlocks(node.children, context: child)
@@ -184,18 +239,43 @@ public struct MarkdownRenderer {
         let output = NSMutableAttributedString()
         var child = context
         child.listDepth += 1
+        // Siblings share the same list identity. Nested items carry the complete
+        // outer-to-inner stack, which AppKit preserves in the RTF list tables.
+        let list = NSTextList(
+            markerFormat: start == nil ? .disc : NSTextList.MarkerFormat(rawValue: "{decimal}."),
+            options: [], startingItemNumber: start.map { Int($0) } ?? 1
+        )
+        child.textLists.append(list)
         for (offset, node) in nodes.enumerated() {
             if output.length > 0 { output.append(attributed("\n", context: child)) }
-            let prefix: String
-            if let item = node as? ListItem, let checkbox = item.checkbox {
-                prefix = checkbox == .checked ? "☑\t" : "☐\t"
-            } else if let start {
-                prefix = "\(start + UInt(offset)).\t"
-            } else {
-                prefix = "•\t"
+            var itemContext = child
+            var leadingBlock = node.child(at: 0)
+            while let quote = leadingBlock as? BlockQuote {
+                itemContext.quoteDepth += 1
+                leadingBlock = quote.child(at: 0)
             }
-            output.append(attributed(prefix, context: child))
-            output.append(renderBlocks(node.children, context: child, separator: "\n"))
+            if includesListMarkers {
+                output.append(attributed("\t" + list.marker(forItemNumber: list.startingItemNumber + offset) + "\t", context: itemContext))
+            }
+            if let item = node as? ListItem, let checkbox = item.checkbox {
+                output.append(attributed(checkbox == .checked ? "☑ " : "☐ ", context: itemContext))
+            }
+            output.append(renderItemBlocks(node.children, context: itemContext))
+        }
+        return output
+    }
+
+    private func renderItemBlocks(_ nodes: some Sequence<any Markup>, context: Context) -> NSAttributedString {
+        let output = NSMutableAttributedString()
+        var followsList = false
+        for block in nodes {
+            let isList = block is OrderedList || block is UnorderedList
+            if output.length > 0 {
+                let separator = isList || followsList ? "\n" : "\u{2028}\u{2028}"
+                output.append(attributed(separator, context: context))
+            }
+            output.append(renderNode(block, context: context))
+            followsList = isList
         }
         return output
     }
